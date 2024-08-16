@@ -1,0 +1,184 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Liga.ru</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .service-option {
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .service-option img {
+            max-width: 100%;
+            height: auto;
+        }
+        .service-option h5 {
+            margin-top: 10px;
+        }
+        .service-option p {
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+
+<header class="d-flex flex-wrap justify-content-center py-3 mb-4 border-bottom">
+    <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-body-emphasis text-decoration-none">
+        <svg class="bi me-2" width="330" height="32">
+            <use xlink:href="#bootstrap"></use>
+        </svg>
+        <span class="fs-2">Редактирование брони услуги</span>
+    </a>
+
+    <ul class="nav nav-pills">
+        <li class="nav-item"><a th:href="@{/api/reservations}" class="nav-link active" aria-current="page">Брони</a>
+        </li>
+        <li class="nav-item"><a th:href="@{/api/boxes}" class="nav-link">Боксы</a></li>
+        <li class="nav-item"><a th:href="@{/api/washings}" class="nav-link">Мойки</a></li>
+        <li class="nav-item"><a th:href="@{/api/users}" class="nav-link">Пользователи</a></li>
+        <li class="nav-item">
+            <form th:action="@{/logout}" method="post" class="btn btn-secondary">
+                <button type="submit" class="nav-link btn btn-link text-white p-0">Выход</button>
+            </form>
+        </li>
+    </ul>
+</header>
+
+<main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+    <div th:if="${message}" class="alert alert-info" role="alert">
+        <span th:text="${message}"></span>
+    </div>
+
+    <div class="col-md-7 col-lg-8">
+        <div th:if="${reservation != null}">
+
+            <h4 class="mb-3">Информация о брони</h4>
+
+            <div class="row g-12">
+                <div class="col-sm-6">
+                    <label for="user" class="form-label">Пользователь</label>
+                    <input type="text" class="form-control" id="user" name="user"
+                           th:value="${reservation.user.username}" readonly>
+                </div>
+
+                <div class="col-sm-6">
+                    <label for="box" class="form-label">Бокс</label>
+                    <input type="text" class="form-control" id="box" name="box"
+                           th:value="${reservation.box.boxNumber}" readonly>
+                </div>
+            </div>
+
+            <div class="row g-12">
+                <div class="col-sm-6">
+                    <label for="resultPrice" class="form-label">Итоговая цена</label>
+                    <input type="number" class="form-control" id="resultPrice" name="resultPrice"
+                           th:value="${reservation.resultPrice}" readonly>
+                </div>
+
+                <div class="col-sm-6">
+                    <label for="status" class="form-label">Статус</label>
+                    <input type="text" class="form-control" id="status" name="status"
+                           th:value="${T(org.example.model.Status).valueOf(reservation.status).name}">
+                </div>
+            </div>
+
+            <div class="row g-12">
+                <div class="col-sm-6">
+                    <label for="startDateTime" class="form-label">Время начала</label>
+                    <input type="datetime-local" class="form-control" id="startDateTime1"
+                           name="startDateTime"
+                           th:value="${reservation.startDateTime != null ? reservation.startDateTime : ''}"
+                           readonly>
+                </div>
+
+                <div class="col-sm-6">
+                    <label for="endDateTime" class="form-label">Время окончания</label>
+                    <input type="datetime-local" class="form-control" id="endDateTime"
+                           name="endDateTime"
+                           th:value="${reservation.endDateTime != null ? reservation.endDateTime : ''}"
+                           readonly>
+                </div>
+            </div>
+
+            <form th:action="@{'/api/reservations/editReservation/' + ${reservation.id} + '/updateDiscount'}"
+                  method="post" class="row g-3 mb-3">
+                <div class="col-sm-6">
+                    <label for="discount" class="form-label">Скидка (%)</label>
+                    <select class="form-control" id="discount" name="discount">
+                        <option th:each="discount : ${discountList}"
+                                th:value="${discount}"
+                                th:selected="${reservation.discount == discount}"
+                                th:text="${discount}"></option>
+                    </select>
+                </div>
+                <div class="col-md-4 d-flex align-items-end"
+                    th:if="${reservation.status != 'CANCELLED' and reservation.status != 'COMPLETED'}">
+                    <button type="submit" class="btn btn-primary">Изменить скидку</button>
+                </div>
+            </form>
+            <hr class="my-4">
+
+            <div th:if="${statusChangeButtons != null}">
+                <div class="d-flex justify-content-end">
+                    <div th:each="entry : ${statusChangeButtons}" class="ms-2">
+                        <form th:action="@{'/api/reservations/editReservation/' + ${reservation.id} + '/updateStatus'}"
+                              method="post" class="d-inline">
+                            <input type="hidden" name="newStatusStr" th:value="${entry.value}"/>
+
+                            <button type="submit" th:text="${entry.key}"
+                                    th:switch="${entry.key}">
+                                <span th:case="'Подтвердить'" class="btn btn-success"></span>
+                                <span th:case="'Отменить'" class="btn btn-danger"></span>
+                                <span th:case="'Завершить'" class="btn btn-success"></span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                <hr class="my-4">
+            </div>
+
+        </div>
+    </div>
+
+    <div class="col-md-7 col-lg-8">
+        <form id="reservationForm" class="needs-validation"
+              th:action="@{${reservation != null} ? '/api/reservations/editReservation/' + ${reservation.id} : '/api/reservations/editReservation'}"
+              method="post" onsubmit="return validateTime(event)">
+
+            <h4 class="mb-3">Услуга</h4>
+            <div th:each="washing : ${washingList}" class="service-option">
+                <input type="radio" th:id="'service' + ${washing.id}" th:name="washingId"
+                       th:value="${washing.id}"
+                       th:checked="${reservation != null ? washing.id == reservation.washing.id : washing.id == selectedWashingId}"
+                       required>
+                <label th:for="'service' + ${washing.id}">
+                    <h5 th:text="${washing.name}"></h5>
+                    <p>Стоимость: <span th:text="${washing.price} + ' руб.'"></span></p>
+                    <p>Длительность: <span th:text="${washing.durationMinute} + ' мин.'"></span></p>
+                </label>
+            </div>
+
+            <hr class="my-4">
+            <h4 class="mb-3">Планируемое время</h4>
+            <div class="mb-3">
+                <label for="startDateTime" class="form-label">Дата и время начала</label>
+                <input type="datetime-local" class="form-control" id="startDateTime" name="startDateTime"
+                       th:value="${reservation != null ? reservation.startDateTime : selectedStartDateTime}" required>
+                <div class="invalid-feedback">Укажите как минимум текущее время + 1 ч.</div>
+            </div>
+
+            <hr class="my-4">
+
+            <button class="w-100 btn btn-primary btn-lg" type="submit">Забронировать время</button>
+            <hr class="my-4">
+        </form>
+    </div>
+</main>
+<script src="/auth.js"></script>
+</body>
+</html>

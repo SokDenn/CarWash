@@ -1,0 +1,98 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>CarWash.ru</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .small-column {
+            width: 150px;
+        }
+         .icon-gray {
+            color: gray;
+        }
+        .icon-gray svg {
+            fill: white;
+            }
+        .userAuthentication {
+                flex-grow: 1;
+                text-align: center;
+            }
+    </style>
+</head>
+
+<body>
+<header class="d-flex flex-wrap justify-content-center py-3 mb-4 border-bottom">
+    <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-body-emphasis text-decoration-none">
+        <svg class="bi me-2" width="330" height="32"><use xlink:href="#bootstrap"></use></svg>
+        <span class="fs-2">Страница типов мойки</span>
+    </a>
+
+    <div class="userAuthentication">
+        <a th:href="@{/api/user/account/edit}" class="btn btn-link" th:text="${userAuthentication.username}"></a>
+    </div>
+
+    <ul class="nav nav-pills">
+        <li class="nav-item"><a th:href="@{/api/reservations}" class="nav-link" aria-current="page">Брони</a></li>
+        <li class="nav-item"><a th:href="@{/api/boxes}" class="nav-link">Боксы</a></li>
+        <li class="nav-item"><a th:href="@{/api/washings}" class="nav-link  active">Мойки</a></li>
+        <li class="nav-item"><a th:href="@{/api/users}" class="nav-link">Пользователи</a></li>
+        <li class="nav-item">
+            <form th:action="@{/logout}" method="post" class="btn btn-secondary">
+                <button type="submit" class="nav-link btn btn-link text-white p-0">Выход</button>
+            </form>
+        </li>
+    </ul>
+</header>
+
+<main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+    <div th:if="${message}" class="alert alert-info" role="alert">
+        <span th:text="${message}"></span>
+    </div>
+
+
+    <div class="d-flex align-items-center mb-3">
+        <h2>Мойки</h2>
+        <a th:href="@{/api/washings/editWashing}" class="btn btn-primary btn-sm ms-3">Добавить мойку</a>
+    </div>
+
+    <div class="table-responsive small">
+        <table class="table table-striped table-sm">
+            <thead>
+            <tr>
+                <th scope="col">Наименование</th>
+                <th scope="col">Стоимость</th>
+                <th scope="col">Длительность</th>
+                <th scope="col">Действия</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="washing : ${washingList}">
+                <td th:text="${washing.name}"></td>
+                <td th:text="${washing.price} + ' руб.'"></td>
+                <td th:text="${washing.durationMinute + ' мин.'}"></td>
+                <td>
+                    <div class="btn-group" role="group" aria-label="Basic example">
+                        <form th:action="@{/api/washings/editWashing/{washingId}(washingId=${washing.id})}" method="get">
+                            <button type="submit" class="btn btn-white">
+                                <i class="fas fa-edit icon-gray"></i>
+                            </button>
+                        </form>
+                        <form th:action="@{/api/washings/{washingId}(washingId=${washing.id})}" method="post">
+                            <input type="hidden" name="_method" value="delete"/>
+                            <button type="submit" class="btn btn-white">
+                                <i class="fas fa-trash-alt icon-gray"></i>
+                            </button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+</main>
+
+</body>
+</html>

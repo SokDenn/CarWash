@@ -1,0 +1,178 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>CarWash.ru</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .small-min-column {
+            width: 100px;
+        }
+         .icon-gray {
+            color: gray;
+        }
+        .icon-gray svg {
+            fill: white;
+            }
+        .userAuthentication {
+                flex-grow: 1;
+                text-align: center;
+            }
+    </style>
+</head>
+
+<body>
+<header class="d-flex flex-wrap justify-content-center py-3 mb-4 border-bottom">
+    <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-body-emphasis text-decoration-none">
+        <svg class="bi me-2" width="330" height="32">
+            <use xlink:href="#bootstrap"></use>
+        </svg>
+        <span class="fs-2">Страница броней</span>
+    </a>
+
+    <div class="userAuthentication">
+        <a th:href="@{/api/user/account/edit}" class="btn btn-link" th:text="${userAuthentication.username}"></a>
+    </div>
+
+    <ul class="nav nav-pills">
+        <li class="nav-item"><a th:href="@{/api/reservations}" class="nav-link active" aria-current="page">Брони</a>
+        </li>
+        <li class="nav-item"><a th:href="@{/api/boxes}" class="nav-link">Боксы</a></li>
+        <li class="nav-item"><a th:href="@{/api/washings}" class="nav-link">Мойки</a></li>
+        <li class="nav-item"><a th:href="@{/api/users}" class="nav-link">Пользователи</a></li>
+        <li class="nav-item">
+            <form th:action="@{/logout}" method="post" class="btn btn-secondary">
+                <button type="submit" class="nav-link btn btn-link text-white p-0">Выход</button>
+            </form>
+        </li>
+    </ul>
+</header>
+
+<main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+    <div th:if="${message}" class="alert alert-info" role="alert">
+        <span th:text="${message}"></span>
+    </div>
+
+    <form th:action="@{/api/reservations}" method="get" class="row g-3 mb-3">
+        <div class="col-md-2">
+            <label for="boxIdFilter" class="form-label">Номер бокса</label>
+            <select id="boxIdFilter" name="boxIdFilter" class="form-select">
+                <option value="" th:selected="${boxIdFilter == null}">Все боксы</option>
+                <option th:each="box : ${boxList}" th:value="${box.id}"
+                        th:selected="${box.id == boxIdFilter}" th:text="${box.boxNumber}"></option>
+            </select>
+        </div>
+
+        <div class="col-md-2">
+            <label for="startDateTimeFilter" class="form-label">Дата и время начала</label>
+            <input type="datetime-local" id="startDateTimeFilter" name="startDateTimeFilter" class="form-control"
+                   th:value="${startDateTimeFilter != null ? startDateTimeFilter : ''}">
+        </div>
+
+        <div class="col-md-2">
+            <label for="endDateTimeFilter" class="form-label">Дата и время окончания</label>
+            <input type="datetime-local" id="endDateTimeFilter" name="endDateTimeFilter" class="form-control"
+                   th:value="${endDateTimeFilter != null ? endDateTimeFilter : ''}">
+        </div>
+
+        <div class="col-md-2">
+            <div class="form-check">
+                <input class="form-check-input" type="radio" id="activeReservationsTrue" name="activeReservations"
+                       value="true"
+                       th:checked="${activeReservations != null && activeReservations == true}">
+                <label class="form-check-label" for="activeReservationsTrue">
+                    Активные брони
+                </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" id="activeReservationsFalse" name="activeReservations"
+                       value="false"
+                       th:checked="${activeReservations != null && activeReservations == false}">
+                <label class="form-check-label" for="activeReservationsFalse">
+                    Неактивные брони
+                </label>
+            </div>
+
+            <div class="form-check">
+                <input class="form-check-input" type="radio" id="activeReservationsNull" name="activeReservations"
+                       value=""
+                       th:checked="${activeReservations == null}">
+                <label class="form-check-label" for="activeReservationsNull">
+                    Все брони
+                </label>
+            </div>
+        </div>
+
+        <div class="col-md-4 d-flex align-items-end">
+            <button type="submit" class="btn btn-primary">Фильтровать</button>
+            <button type="submit" class="btn btn-secondary ms-3" name="displayRevenue" value="true">Отобразить доход</button>
+        </div>
+    </form>
+
+    <div th:if="${resultRevenue}" class="revenue-display alert alert-info">
+        Общая выручка за выбранный период: <span th:text="${resultRevenue}">0</span> руб.
+    </div>
+
+
+    <div class="d-flex align-items-center mb-3">
+        <h2>Брони</h2>
+        <a th:href="@{/api/reservations/editReservation}" class="btn btn-primary btn-sm ms-3">Добавить бронь</a>
+    </div>
+
+    <div class="table-responsive small">
+        <table class="table table-striped table-sm">
+            <thead>
+            <tr>
+                <th scope="col" class="small-min-column">Номер бокса</th>
+                <th scope="col" class="small-min-column">Имя оператора</th>
+                <th scope="col">Услуга</th>
+                <th scope="col" class="small-min-column">Стоимость</th>
+                <th scope="col">Скидка</th>
+                <th scope="col" class="small-min-column">Пользователь</th>
+                <th scope="col" class="small-min-column">Статус</th>
+                <th scope="col">Время начала</th>
+                <th scope="col">Время окончания</th>
+                <th scope="col">Время создания</th>
+                <th scope="col">Действия</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="reservation : ${reservationList}">
+                <td th:text="${reservation.box.boxNumber}"></td>
+                <td th:text="${reservation.box.userOperator.username}"></td>
+                <td th:text="${reservation.washing.name}"></td>
+                <td th:text="${reservation.resultPrice + ' руб.'}"></td>
+                <td th:text="${reservation.discount + ' %'}"></td>
+                <td th:text="${reservation.user.username}"></td>
+                <td th:text="${T(org.example.model.Status).valueOf(reservation.status).name}"></td>
+                <td th:text="${#temporals.format(reservation.startDateTime, 'dd.MM.yyyy HH:mm')}"></td>
+                <td th:text="${#temporals.format(reservation.endDateTime, 'dd.MM.yyyy HH:mm')}"></td>
+                <td th:text="${#temporals.format(reservation.creationDateTime, 'dd.MM.yyyy HH:mm')}"></td>
+
+                <td>
+                    <div class="btn-group" role="group" aria-label="Basic example">
+                        <form th:action="@{/api/reservations/editReservation/{reservationId}(reservationId=${reservation.id})}"
+                              method="get">
+                            <button type="submit" class="btn btn-white">
+                                <i class="fas fa-edit icon-gray"></i>
+                            </button>
+                        </form>
+                        <form th:action="@{/api/reservations/{reservationId}(reservationId=${reservation.id})}"
+                              method="post">
+                            <input type="hidden" name="_method" value="delete"/>
+                            <button type="submit" class="btn btn-white">
+                                <i class="fas fa-trash-alt icon-gray"></i>
+                            </button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+</main>
+
+</body>
+</html>

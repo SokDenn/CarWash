@@ -1,0 +1,122 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Liga.ru</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .small-column {
+            width: 150px;
+        }
+        .icon-gray {
+            color: gray;
+        }
+        .icon-gray svg {
+            fill: white;
+        }
+        .invalid-feedback {
+            display: none;
+        }
+        .is-invalid .invalid-feedback {
+            display: block;
+        }
+    </style>
+    <script>
+        function validateTimes(event) {
+            var openingTime = document.getElementById('openingTime').value;
+            var closingTime = document.getElementById('closingTime').value;
+
+            if (openingTime >= closingTime) {
+                event.preventDefault();
+                alert('Время открытия не может быть позже или равно времени закрытия.');
+                return false;
+            }
+            return true;
+        }
+    </script>
+</head>
+<body>
+
+<header class="d-flex flex-wrap justify-content-center py-3 mb-4 border-bottom">
+    <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-body-emphasis text-decoration-none">
+        <svg class="bi me-2" width="330" height="32">
+            <use xlink:href="#bootstrap"></use>
+        </svg>
+        <span class="fs-2">Добавление или обновление бокса</span>
+    </a>
+
+    <ul class="nav nav-pills">
+        <li class="nav-item"><a th:href="@{/api/reservations}" class="nav-link" aria-current="page">Брони</a></li>
+        <li class="nav-item"><a th:href="@{/api/boxes}" class="nav-link  active">Боксы</a></li>
+        <li class="nav-item"><a th:href="@{/api/washings}" class="nav-link">Мойки</a></li>
+        <li class="nav-item"><a th:href="@{/api/users}" class="nav-link">Пользователи</a></li>
+        <li class="nav-item">
+            <form th:action="@{/logout}" method="post" class="btn btn-secondary">
+                <button type="submit" class="nav-link btn btn-link text-white p-0">Выход</button>
+            </form>
+        </li>
+    </ul>
+</header>
+
+<main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+
+    <div class="col-md-7 col-lg-8">
+        <form id="boxForm" class="needs-validation"
+              th:action="@{${box != null} ? '/api/boxes/editBox/' + ${box.id} : '/api/boxes/editBox'}"
+              method="post" onsubmit="return validateTimes(event)">
+
+            <div class="row g-12">
+                <div class="col-sm-6">
+                    <label for="boxNumber" class="form-label">Номер бокса</label>
+                    <select id="boxNumber" name="boxNumber" class="form-select" required>
+                        <option value="" th:selected="${box == null}">Выберите номер бокса</option>
+                        <option th:each="boxNumber : ${boxNumberList}"
+                                th:value="${boxNumber}"
+                                th:selected="${box != null and box.boxNumber == boxNumber}"
+                                th:text="${boxNumber}"></option>
+                    </select>
+                </div>
+
+                <div class="col-sm-6">
+                    <label for="washingСoefficient" class="form-label">Коэффициент мойки</label>
+                    <input type="number" class="form-control"
+                           id="washingСoefficient" name="washingСoefficient"
+                           th:value="${box != null ? box.washingСoefficient : ''}" required step="0.01">
+                </div>
+            </div>
+
+            <div class="row g-12">
+                <div class="col-6">
+                    <label for="openingTime" class="form-label">Время открытия</label>
+                    <input type="time" class="form-control"
+                           id="openingTime" name="openingTime"
+                           th:value="${box != null ? box.openingTime : ''}" required>
+                </div>
+
+                <div class="col-6">
+                    <label for="closingTime" class="form-label">Время закрытия</label>
+                    <input type="time" class="form-control"
+                           id="closingTime" name="closingTime"
+                           th:value="${box != null ? box.closingTime : ''}" required>
+                </div>
+
+            </div>
+
+            <div class="col-sm-6">
+                <label for="userOperatorId" class="form-label">Имя оператора</label>
+                <select id="userOperatorId" name="userOperatorId" class="form-select" required>
+                    <option value="" th:selected="${box == null}">Выберите оператора</option>
+                    <option th:each="userOperator : ${userOperatorList}"
+                            th:value="${userOperator.id}"
+                            th:selected="${box != null and box.userOperator.id == userOperator.id}"
+                            th:text="${userOperator.username}"></option>
+                </select>
+            </div>
+            <hr class="my-4">
+            <button class="w-100 btn btn-primary btn-lg" type="submit">Внести изменения</button>
+        </form>
+    </div>
+</main>
+</body>
+</html>

@@ -1,0 +1,114 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Liga.ru</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .small-column {
+            width: 150px;
+        }
+        .icon-gray {
+            color: gray;
+        }
+        .icon-gray svg {
+            fill: white;
+        }
+        .invalid-feedback {
+            display: none;
+        }
+        .is-invalid .invalid-feedback {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+<header class="d-flex flex-wrap justify-content-center py-3 mb-4 border-bottom">
+    <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-body-emphasis text-decoration-none">
+        <svg class="bi me-2" width="330" height="32">
+            <use xlink:href="#bootstrap"></use>
+        </svg>
+        <span class="fs-2">Добавление или обновление мойки</span>
+    </a>
+
+    <ul class="nav nav-pills">
+        <li class="nav-item"><a th:href="@{/api/reservations}" class="nav-link" aria-current="page">Брони</a></li>
+        <li class="nav-item"><a th:href="@{/api/boxes}" class="nav-link">Боксы</a></li>
+        <li class="nav-item"><a th:href="@{/api/washings}" class="nav-link  active">Мойки</a></li>
+        <li class="nav-item"><a th:href="@{/api/users}" class="nav-link">Пользователи</a></li>
+        <li class="nav-item">
+            <form th:action="@{/logout}" method="post" class="btn btn-secondary">
+                <button type="submit" class="nav-link btn btn-link text-white p-0">Выход</button>
+            </form>
+        </li>
+    </ul>
+</header>
+
+<main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+
+    <div class="col-md-7 col-lg-8">
+        <form id="boxForm" class="needs-validation"
+              th:action="@{${washing != null} ? '/api/washings/editWashing/' + ${washing.id} : '/api/washings/editWashing'}"
+              method="post" onsubmit="return validateForm()">
+
+            <div class="row g-12">
+                <div class="col-sm-6">
+                    <label for="name" class="form-label">Наименование мойки</label>
+                    <input type="text" class="form-control" id="name" name="name"
+                           th:value="${washing != null ? washing.name : ''}" required>
+                </div>
+
+                <div class="col-6">
+                    <label for="price" class="form-label">Стоимость в рублях</label>
+                    <input type="number" class="form-control"
+                           id="price" name="price"
+                           th:value="${washing != null ? washing.price : ''}" required>
+                </div>
+            </div>
+
+            <div class="col-sm-6">
+                <label for="durationMinute" class="form-label">Время мойки в минутах</label>
+                <input type="number" class="form-control"
+                       id="durationMinute" name="durationMinute"
+                       th:value="${washing != null ? washing.durationMinute : '' }" required step="10">
+            </div>
+
+
+            <hr class="my-4">
+            <button class="w-100 btn btn-primary btn-lg" type="submit">Внести изменения</button>
+        </form>
+    </div>
+</main>
+
+<script>
+    function validateForm() {
+        const nameInput = document.getElementById("name");
+        const durationMinuteInput = document.getElementById("durationMinute");
+        const priceInput = document.getElementById("price");
+        const namePattern = /^[а-яА-ЯёЁ\s]+$/;
+
+        if (!namePattern.test(nameInput.value)) {
+            alert("Наименование услуги должно быть не пустым и содержать только русские буквы.");
+            return false;
+        }
+
+        const durationMinuteValue = parseInt(durationMinuteInput.value, 10);
+        if (durationMinuteValue > 360 || durationMinuteValue < 0) {
+            alert("Введите положительное число или время в минутах до 6ч");
+            return false;
+        }
+
+        const priceValue = parseInt(priceInput.value, 10);
+        if (priceValue > 100000 || priceValue < 0) {
+            alert("Введите положительное число или стоимость до 100 000р");
+            return false;
+        }
+
+        return true;
+    }
+</script>
+
+</body>
+</html>
