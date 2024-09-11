@@ -33,31 +33,20 @@ public class ReservationController {
                                @RequestParam(name = "displayRevenue", required = false) Boolean displayRevenue,
                                Model model) {
 
-        List<Reservation> reservationList;
-        User userAuthentication = userService.getAuthenticationUser();
+        List<Reservation> reservationList = reservationService.getFilteredReservations(
+                boxIdFilter, startDateTimeStr, endDateTimeStr, activeReservations, displayRevenue);
 
-        if (displayRevenue != null && userAuthentication.getRole().getName().equals("ADMIN")) {
-
-            reservationList = reservationService.returnCompletedReservationList(startDateTimeStr, endDateTimeStr);
+        if (displayRevenue != null && userService.isAdmin()) {
             model.addAttribute("resultRevenue", reservationService.calculateRevenue(reservationList));
-
-        } else {
-            reservationList = reservationService
-                    .returnFilteredReservationList(boxIdFilter, startDateTimeStr, endDateTimeStr, activeReservations);
-
-            model.addAttribute("activeReservations", activeReservations);
-            model.addAttribute("boxIdFilter", boxIdFilter);
-
-            if (displayRevenue != null && !userAuthentication.getRole().equals("ADMIN")) {
-                model.addAttribute("message", "Функция доступна только админу!");
-            }
+        } else if (displayRevenue != null && !userService.isAdmin()) {
+            model.addAttribute("message", "Функция доступна только админу!");
         }
 
+        model.addAttribute("activeReservations", activeReservations);
+        model.addAttribute("boxIdFilter", boxIdFilter);
         model.addAttribute("startDateTimeFilter", startDateTimeStr);
         model.addAttribute("endDateTimeFilter", endDateTimeStr);
-
-        model.addAttribute("userAuthentication", userAuthentication);
-
+        model.addAttribute("userAuthentication", userService.getAuthenticationUser());
         model.addAttribute("boxList", boxService.findAllActive());
         model.addAttribute("reservationList", reservationList);
 
@@ -77,6 +66,7 @@ public class ReservationController {
 
         return "redirect:/api/reservations/editReservation/" + reservationId;
     }
+
     @PreAuthorize("hasAuthority('ADMIN')")
     @DeleteMapping("/{id}")
     public String deleteReservation(@PathVariable UUID id) {

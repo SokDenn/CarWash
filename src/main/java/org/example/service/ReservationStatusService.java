@@ -109,6 +109,7 @@ public class ReservationStatusService {
                 reservationService.saveReservation(reservation);
             }
         }
+        userService.deleteUser(userId);
     }
 
     public boolean updateReservationStatus(UUID reservationId, String newStatusStr) {

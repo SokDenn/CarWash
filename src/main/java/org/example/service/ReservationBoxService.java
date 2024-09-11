@@ -56,7 +56,7 @@ public class ReservationBoxService {
 
     public Reservation createReservation(UUID washingId, LocalDateTime startDateTime) {
         Washing washing = washingService.getWashingById(washingId);
-        if(washing == null) throw new IllegalArgumentException("Тип мойки не найден");
+        if (washing == null) throw new IllegalArgumentException("Тип мойки не найден");
 
         Box suitableBox = findSuitableBox(washing, startDateTime);
         if (suitableBox == null) {
@@ -72,15 +72,21 @@ public class ReservationBoxService {
                 user
         );
 
-        return reservationService.saveReservation(reservation);
+        Reservation reservationSave = reservationService.saveReservation(reservation);
+        String confirmationLink = "http://localhost:8080/api/reservations/confirm/" + reservation.getId();
+        System.out.println("Для подтверждения брони перейдите по ссылке: " + confirmationLink);
+
+        return reservationSave;
     }
 
     public boolean updateReservation(UUID reservationId, UUID washingId, LocalDateTime startDateTime) {
         Washing washing = washingService.getWashingById(washingId);
-        if(washing == null) throw new IllegalArgumentException("Тип мойки не найден");
+        if (washing == null) {
+            throw new IllegalArgumentException("Тип мойки не найден");
+        }
 
         Reservation editReservation = reservationService.getReservationById(reservationId);
-        if(editReservation.getWashing().getId() == washingId && editReservation.getStartDateTime().equals(startDateTime)){
+        if (editReservation.getWashing().getId() == washingId && editReservation.getStartDateTime().equals(startDateTime)) {
             return false;
         }
         //Временно отменяем бронь чтобы при поиске учитывалось этот же время в боксе

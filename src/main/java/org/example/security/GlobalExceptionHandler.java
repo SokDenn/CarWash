@@ -21,4 +21,15 @@ public class GlobalExceptionHandler {
         String referer = request.getHeader("Referer");
         return new RedirectView(referer != null ? referer : "/api/reservations");
     }
+
+    @ExceptionHandler(ActionException.class)
+    public RedirectView handleActionException(HttpServletRequest request,
+                                                          ActionException e,
+                                                          RedirectAttributes redirectAttributes) {
+
+        redirectAttributes.addFlashAttribute("message", e.getMessage());
+
+        String referer = request.getHeader("Referer");
+        return new RedirectView(referer != null ? referer : "/api/user/account/edit");
+    }
 }

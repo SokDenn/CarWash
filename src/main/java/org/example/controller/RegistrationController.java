@@ -2,6 +2,7 @@ package org.example.controller;
 
 import org.example.model.User;
 import org.example.repo.UserRepo;
+import org.example.security.SecurityValidator;
 import org.example.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -20,12 +21,14 @@ public class RegistrationController {
     private UserRepo userRepo;
     @Autowired
     private UserService userService;
+    @Autowired
+    private SecurityValidator securityValidator;
 
     @GetMapping
     public String registration(RedirectAttributes redirectAttributes){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
-        if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getName())) {
+        if (securityValidator.isAuthenticated()) {
             redirectAttributes.addFlashAttribute("message",
                     "Вы уже зарегистрированы! Необходимо сначала выйти из системы");
 

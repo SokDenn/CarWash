@@ -101,7 +101,6 @@ public class UserController {
             return "redirect:/api/users";
         }
 
-        userService.deleteUser(id);
         reservationStatusService.cancelledReservationFromUser(id);
         return "redirect:/api/users";
     }

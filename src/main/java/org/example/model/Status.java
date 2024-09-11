@@ -25,22 +25,22 @@ public enum Status {
     }
 
     public static Status numberOfStatus(int numberStatus) {
-        for (Status values : Status.values()) {
-            if (values.number == numberStatus) return values;
+        for (Status status : Status.values()) {
+            if (status.number == numberStatus) return status;
         }
         return null;
     }
 
     public static Status nameOfStatus(String name) {
-        for (Status values : Status.values()) {
-            if (values.name.equalsIgnoreCase(name)) return values;
+        for (Status status : Status.values()) {
+            if (status.name.equalsIgnoreCase(name)) return status;
         }
         return null;
     }
 
     public static Status nameEntityOfStatus(String entityName) {
-        for (Status values : Status.values()) {
-            if (values.toString().equalsIgnoreCase(entityName)) return values;
+        for (Status status : Status.values()) {
+            if (status.toString().equalsIgnoreCase(entityName)) return status;
         }
         return null;
     }

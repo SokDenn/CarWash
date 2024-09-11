@@ -2,9 +2,7 @@ package org.example.security;
 
 import org.example.Jwt.JwtRequest;
 import org.example.model.Reservation;
-import org.example.model.Role;
 import org.example.model.User;
-import org.example.service.ReservationService;
 import org.example.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -19,7 +17,7 @@ public class SecurityValidator {
     @Autowired
     private UserService userService;
 
-    public boolean canEditReservation(Reservation reservation, Authentication authentication) {
+    public boolean canEditReservation(Reservation reservation) {
 
         User userAuthentication = userService.getAuthenticationUser();
 
@@ -41,5 +39,14 @@ public class SecurityValidator {
         return authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(authenticationRequest.getUsername(), authenticationRequest.getPassword())
         );
+    }
+
+    public boolean isAuthenticated(){
+        try {
+            User userAuthentication = userService.getAuthenticationUser();
+            return true;
+        }catch (RuntimeException e){
+           return false;
+        }
     }
 }

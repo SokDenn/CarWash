@@ -48,7 +48,7 @@ create table reservation (
     user_id UUID,
     start_date_time TIMESTAMP,
     end_date_time TIMESTAMP,
-    creation_date_time TIMESTAMP,
+    creation_date_time TIMESTAMP NOT NULL,
     status VARCHAR(255) CHECK (status IN ('WAITING_RESERVATION', 'BOOKED', 'AT_CAR_WASH', 'CANCELLED', 'COMPLETED')),
     is_deleted BOOLEAN NOT NULL,
     CONSTRAINT reservation_box_fk FOREIGN KEY (box_id) REFERENCES box(id),

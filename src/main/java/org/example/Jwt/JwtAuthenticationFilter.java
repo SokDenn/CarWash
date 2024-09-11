@@ -19,6 +19,7 @@ import java.io.IOException;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
+    private static final String TOKEN_PREFIX = "Bearer ";
     @Autowired
     private JwtUtil jwtUtil;
     @Autowired
@@ -37,8 +38,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String username = null;
         String jwtToken = null;
 
-        if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer ")) {
-            jwtToken = requestTokenHeader.substring(7);
+        if (requestTokenHeader != null && requestTokenHeader.startsWith(TOKEN_PREFIX)) {
+            jwtToken = requestTokenHeader.substring(TOKEN_PREFIX.length());
             try {
                 username = jwtUtil.getUsernameFromToken(jwtToken);
             } catch (ExpiredJwtException e) {

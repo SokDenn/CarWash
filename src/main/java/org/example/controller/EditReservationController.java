@@ -54,20 +54,15 @@ public class EditReservationController {
         }
 
         redirectAttributes.addFlashAttribute("message", "На почту отправлена ссылка для подтверждения");
-
-        String confirmationLink = "http://localhost:8080/api/reservations/confirm/" + reservation.getId();
-        System.out.println("Для подтверждения брони перейдите по ссылке: " + confirmationLink);
-
         return "redirect:/api/reservations/editReservation/" + reservation.getId();
     }
 
     @GetMapping("/{reservationId}")
     public String editReservation(@PathVariable UUID reservationId,
                                   RedirectAttributes redirectAttributes,
-                                  Authentication authentication,
                                   Model model) {
 
-        if (!securityValidator.canEditReservation(reservationService.getReservationById(reservationId), authentication)) {
+        if (!securityValidator.canEditReservation(reservationService.getReservationById(reservationId))) {
             redirectAttributes.addFlashAttribute("message", "Вы не можете редактировать не свою запись!");
             return "redirect:/api/reservations";
         }

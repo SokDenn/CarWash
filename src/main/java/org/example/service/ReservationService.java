@@ -1,5 +1,6 @@
 package org.example.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import org.example.converter.StringConverter;
 import org.example.model.*;
@@ -50,7 +51,8 @@ public class ReservationService {
     }
 
     public void deleteReservation(UUID id) {
-        Reservation reservation = reservationRepo.findById(id).orElse(null);
+        Reservation reservation = reservationRepo.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Reservation c ID: " + id + " не найден"));
 
         if (reservation != null) {
             reservation.setIsDeleted(true);
@@ -92,12 +94,21 @@ public class ReservationService {
         return resultRevenue;
     }
 
-    public void updateReservationDiscount(UUID reservationId, Integer discount){
+    public void updateReservationDiscount(UUID reservationId, Integer discount) {
         Reservation reservation = getReservationById(reservationId);
         Integer washingPrice = reservation.getWashing().getPrice();
 
-        reservation.setResultPrice(washingPrice - (washingPrice/100*discount));
+        reservation.setResultPrice(washingPrice - (washingPrice / 100 * discount));
         reservation.setDiscount(discount);
         saveReservation(reservation);
+    }
+
+    public List<Reservation> getFilteredReservations(UUID boxIdFilter, String startDateTimeStr, String endDateTimeStr,
+                                                     Boolean activeReservations, Boolean displayRevenue){
+
+        if (userService.isAdmin() && displayRevenue != null) {
+            return returnCompletedReservationList(startDateTimeStr, endDateTimeStr);
+        }
+        return returnFilteredReservationList(boxIdFilter, startDateTimeStr, endDateTimeStr, activeReservations);
     }
 }

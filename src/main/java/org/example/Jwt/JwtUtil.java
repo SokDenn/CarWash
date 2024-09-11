@@ -16,6 +16,8 @@ import java.util.function.Function;
 
 @Component
 public class JwtUtil {
+    private static final String ROLES_KEY = "roles";
+
     //аннотация для внедрения значения секретного ключа из конфигурационного файла.
     @Value("${jwt.secret}")
     private String secret;
@@ -51,7 +53,7 @@ public class JwtUtil {
     }
 
     public List<String> getRolesFromToken(String token) {
-        return getAllClaimsFromToken(token).get("roles", List.class);
+        return getAllClaimsFromToken(token).get(ROLES_KEY, List.class);
     }
 
     private Boolean isTokenExpired(String token) {
@@ -81,13 +83,13 @@ public class JwtUtil {
                 .httpOnly(true)
                 .secure(true)
                 .path("/")
-                .maxAge(1 * 24 * 60 * 60) // 1 день
+                .maxAge(86400) // 1 день (1 * 24 * 60 * 60)
                 .build();
     }
     public String generatePasswordResetToken(String username) {
         Map<String, Object> claims = new HashMap<>();
 
-        Long passwordResetExpiration = 1 * 60 * 1000L; // 5 минут
+        Long passwordResetExpiration = 60000L; // 5 минут (1 * 60 * 1000L)
         return createToken(claims, username, passwordResetExpiration);
     }
 

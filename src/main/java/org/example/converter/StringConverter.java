@@ -10,24 +10,26 @@ import java.time.format.DateTimeParseException;
 @Component
 public class StringConverter {
     public LocalTime convertTime(String timeStr) {
+        LocalTime localTime = null;
         try {
-            LocalTime localTime = LocalTime.parse(timeStr, DateTimeFormatter.ofPattern("HH:mm"));
-            return localTime;
+            localTime = LocalTime.parse(timeStr, DateTimeFormatter.ofPattern("HH:mm"));
 
         } catch (Exception e) {
             System.out.println("Ошибка парсинга времени: " + e.getMessage());
+            return null;
         }
-        return null;
+        return localTime;
     }
 
     public LocalDateTime convertDataTime(String dataTimeStr) {
+        LocalDateTime localDateTime = null;
         try {
-            LocalDateTime localDateTime = LocalDateTime.parse(dataTimeStr, DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm"));
-            return localDateTime;
+            localDateTime = LocalDateTime.parse(dataTimeStr, DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm"));
 
         } catch (Exception e) {
             System.out.println("Ошибка парсинга даты и времени: " + e.getMessage());
+            return null;
         }
-        return null;
+        return localDateTime;
     }
 }

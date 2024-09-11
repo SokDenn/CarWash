@@ -1,5 +1,6 @@
 package org.example.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.example.model.User;
 import org.example.repo.RoleRepo;
 import org.example.repo.UserRepo;
@@ -38,10 +39,12 @@ public class UserService implements UserDetailsService {
     public User saveUser(User user) {
         return userRepo.save(user);
     }
-    public User findByUsername(String username){
+
+    public User findByUsername(String username) {
         return userRepo.findByUsername(username).orElse(null);
     }
-    public void updatePassword (String username, String password){
+
+    public void updatePassword(String username, String password) {
         User user = findByUsername(username);
         user.setPassword(passwordEncoder.encode(password));
         saveUser(user);
@@ -50,7 +53,9 @@ public class UserService implements UserDetailsService {
     public boolean createUser(String username, String password, UUID roleId) {
         User user = new User(username, passwordEncoder.encode(password));
         if (roleId != null) {
-            user.setRole(roleRepo.findById(roleId).orElse(null));
+            user.setRole(roleRepo.findById(roleId)
+                    .orElseThrow(() -> new EntityNotFoundException("Роль c ID: " + roleId + " не найдена")));
+
         } else {
             user.setRole(roleRepo.findByName("USER").orElse(null));
         }
@@ -61,12 +66,15 @@ public class UserService implements UserDetailsService {
 
     public boolean updateUser(UUID userId, String username, String password, UUID roleId) {
 
-        User user = userRepo.findById(userId).orElse(null);
+        User user = userRepo.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("Пользователь c ID: " + userId + " не найден"));
+
         if (user != null) {
             user.setUsername(username);
             user.setPassword(passwordEncoder.encode(password));
             if (roleId != null) {
-                user.setRole(roleRepo.findById(roleId).orElse(null));
+                user.setRole(roleRepo.findById(roleId)
+                        .orElseThrow(() -> new EntityNotFoundException("Роль c ID: " + roleId + " не найдена")));
             }
             saveUser(user);
             return true;
@@ -75,7 +83,8 @@ public class UserService implements UserDetailsService {
     }
 
     public void deleteUser(UUID userId) {
-        User user = userRepo.findById(userId).orElse(null);
+        User user = userRepo.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("Пользователь c ID: " + userId + " не найден"));
 
         if (user != null) {
 
@@ -85,7 +94,8 @@ public class UserService implements UserDetailsService {
     }
 
     public boolean isUsernameUnique(UUID userId, String username) {
-        User user = userRepo.findByUsername(username).orElse(null);
+        User user = userRepo.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("Пользователь c логином: " + username + " не найден"));;
 
         if (user == null || user.getId().equals(userId)) {
             return true;
@@ -110,7 +120,12 @@ public class UserService implements UserDetailsService {
 
     public User getAuthenticationUser() {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User user = userRepo.findByUsername(userDetails.getUsername()).orElseThrow(() -> new RuntimeException("User not found"));
+        User user = userRepo.findByUsername(userDetails.getUsername()).orElseThrow(() -> new RuntimeException("User не найден"));
         return user;
+    }
+
+    public boolean isAdmin(){
+        User user = getAuthenticationUser();
+        return user.getRole().getName().equals("ADMIN");
     }
 }

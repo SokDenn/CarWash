@@ -8,11 +8,7 @@ import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import org.example.converter.StringConverter;
 import org.example.model.Reservation;
-import org.example.model.Status;
 import org.example.model.User;
-import org.example.repo.ReservationRepoCastom;
-import org.example.repo.UserRepo;
-import org.example.service.BoxService;
 import org.example.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -21,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class ReservationRepoCastomImpl implements ReservationRepoCastom {
+public class ReservationRepoCustomImpl implements ReservationRepoCustom {
     @Autowired
     UserRepo userRepo;
     @PersistenceContext

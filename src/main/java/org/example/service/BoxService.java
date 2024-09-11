@@ -1,17 +1,17 @@
 package org.example.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.example.converter.StringConverter;
 import org.example.model.Box;
-import org.example.model.Reservation;
-import org.example.model.Washing;
 import org.example.repo.BoxRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.*;
+import java.util.List;
+import java.util.SortedSet;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -28,7 +28,7 @@ public class BoxService {
         return boxRepo.findById(id).orElse(null);
     }
 
-    public boolean createBox(int boxNumber, UUID userOperatorId, BigDecimal washingСoefficient,
+    public UUID createBox(int boxNumber, UUID userOperatorId, BigDecimal washingСoefficient,
                              String openingTimeStr, String closingTimeStr) {
 
         try {
@@ -39,16 +39,15 @@ public class BoxService {
             if (userOperatorId != null) {
                 box.setUserOperator(userService.getUserById(userOperatorId));
             }
-            saveBox(box);
-            return true;
+            return box.getId();
 
         } catch (Exception e) {
             System.out.println("Ошибка создания бокса: " + e.getMessage());
-            return false;
+            return null;
         }
     }
 
-    public boolean updateBox(UUID boxId, int boxNumber, UUID userOperatorId, BigDecimal washingСoefficient, String openingTimeStr, String closingTimeStr) {
+    public UUID updateBox(UUID boxId, int boxNumber, UUID userOperatorId, BigDecimal washingСoefficient, String openingTimeStr, String closingTimeStr) {
 
         try {
             Box box = boxRepo.findById(boxId).orElseThrow();
@@ -61,18 +60,15 @@ public class BoxService {
             box.setClosingTime(closingTime);
             if (userOperatorId != null) {
                 box.setUserOperator(userService.getUserById(userOperatorId));
-            } else{
+            } else {
                 box.setUserOperator(null);
             }
 
-            saveBox(box);
-            return true;
-
         } catch (Exception e) {
             System.out.println("Ошибка обновления бокса: " + e.getMessage());
-            return false;
+            return null;
         }
-
+        return boxId;
     }
 
     public List<Integer> getAvailableBoxNumbers(UUID boxId) {
@@ -102,7 +98,8 @@ public class BoxService {
     }
 
     public void deleteBox(UUID boxId) {
-        Box box = boxRepo.findById(boxId).orElse(null);
+        Box box = boxRepo.findById(boxId)
+                .orElseThrow(() -> new EntityNotFoundException("Box c ID: " + boxId + " не найден"));
 
         if (box != null) {
             box.setIsDeleted(true);
