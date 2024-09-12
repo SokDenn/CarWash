@@ -20,19 +20,19 @@ public class ReservationBoxService {
     @Autowired
     private WashingService washingService;
 
-    public Box findSuitableBox(Washing washing, LocalDateTime startDateTime) {
+    public Box findSuitableBox(Washing washing, LocalDateTime startDateTime, Reservation currentReservation) {
         List<Box> availableBoxes = boxService.findAllActive();
 
         // Фильтруем боксы по времени открытия, закрытия и наличию пересекающихся бронирований
         List<Box> suitableBoxes = availableBoxes.stream()
-                .filter(box -> isBoxAvailable(box, startDateTime, washing.getDurationMinute()))
+                .filter(box -> isBoxAvailable(box, startDateTime, washing.getDurationMinute(), currentReservation))
                 .sorted(Comparator.comparing(Box::getWashingСoefficient))
                 .toList();
 
         return suitableBoxes.isEmpty() ? null : suitableBoxes.get(0);
     }
 
-    private boolean isBoxAvailable(Box box, LocalDateTime startDateTime, int durationMinutes) {
+    private boolean isBoxAvailable(Box box, LocalDateTime startDateTime, int durationMinutes, Reservation currentReservation) {
         LocalDateTime endDateTime = startDateTime.plusMinutes
                 ((long) (durationMinutes * box.getWashingСoefficient().floatValue()));
 
@@ -44,8 +44,10 @@ public class ReservationBoxService {
         List<Reservation> reservations = reservationService.findRelevantReservationsByBox
                 (box.getId(), startDateTime.minusHours(1), endDateTime.plusHours(1));
 
+        // Проверяем на пересечения с бронированиями, исключая текущее бронирование
         for (Reservation reservation : reservations) {
-            if (reservation.getEndDateTime().isAfter(startDateTime) &&
+            if (!reservation.equals(currentReservation) &&
+                    reservation.getEndDateTime().isAfter(startDateTime) &&
                     reservation.getStartDateTime().isBefore(endDateTime)) {
                 return false;
             }
@@ -58,7 +60,7 @@ public class ReservationBoxService {
         Washing washing = washingService.getWashingById(washingId);
         if (washing == null) throw new IllegalArgumentException("Тип мойки не найден");
 
-        Box suitableBox = findSuitableBox(washing, startDateTime);
+        Box suitableBox = findSuitableBox(washing, startDateTime, null);
         if (suitableBox == null) {
             return null;
         }
@@ -86,32 +88,40 @@ public class ReservationBoxService {
         }
 
         Reservation editReservation = reservationService.getReservationById(reservationId);
-        if (editReservation.getWashing().getId() == washingId && editReservation.getStartDateTime().equals(startDateTime)) {
+        if (isUnchangedOrCompleted(editReservation, washingId, startDateTime)) {
             return false;
         }
-        //Временно отменяем бронь чтобы при поиске учитывалось этот же время в боксе
-        String editStatus = editReservation.getStatus();
-        editReservation.setStatus(Status.CANCELLED.toString());
-        reservationService.saveReservation(editReservation);
 
-        Box suitableBox = findSuitableBox(washing, startDateTime);
+        Box suitableBox = findSuitableBox(washing, startDateTime, editReservation);
         if (suitableBox == null) {
-            editReservation.setStatus(editStatus);
-            reservationService.saveReservation(editReservation);
             return false;
         }
 
-        editReservation.setBox(suitableBox);
-        editReservation.setWashing(washing);
-        editReservation.setDiscount(0);
-        editReservation.setResultPrice(washing.getPrice());
-        editReservation.setStatus(Status.WAITING_RESERVATION.toString());
-        editReservation.setStartDateTime(startDateTime);
-        editReservation.setEndDateTime(startDateTime.plusMinutes((long)
-                (washing.getDurationMinute() * suitableBox.getWashingСoefficient().floatValue())));
-
+        updateReservationDetails(editReservation, washing, suitableBox, startDateTime);
         reservationService.saveReservation(editReservation);
 
         return true;
+    }
+
+    private boolean isUnchangedOrCompleted(Reservation reservation, UUID washingId, LocalDateTime startDateTime) {
+        return reservation.getWashing().getId().equals(washingId)
+                && reservation.getStartDateTime().equals(startDateTime)
+                || reservation.getStatus().equals(Status.COMPLETED.toString())
+                || reservation.getStatus().equals(Status.CANCELLED.toString());
+    }
+
+    private void updateReservationDetails(Reservation reservation, Washing washing, Box box, LocalDateTime startDateTime) {
+        reservation.setBox(box);
+        reservation.setWashing(washing);
+        reservation.setDiscount(0);
+        reservation.setResultPrice(washing.getPrice());
+        reservation.setStatus(Status.WAITING_RESERVATION.toString());
+        reservation.setStartDateTime(startDateTime);
+        reservation.setEndDateTime(calculateEndDateTime(startDateTime, washing, box));
+    }
+
+    private LocalDateTime calculateEndDateTime(LocalDateTime startDateTime, Washing washing, Box box) {
+        return startDateTime.plusMinutes((long)
+                (washing.getDurationMinute() * box.getWashingСoefficient().floatValue()));
     }
 }

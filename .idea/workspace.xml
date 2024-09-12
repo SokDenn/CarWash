@@ -4,34 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="980122c5-98ea-4b63-81ff-502fac078573" name="Changes" comment="Реализовано экзаменационное задание - автомойка">
-      <change afterPath="$PROJECT_DIR$/src/main/java/org/example/security/ActionException.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/org/example/security/ActionResponse.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/org/example/service/AccountService.java" afterDir="false" />
+    <list default="true" id="980122c5-98ea-4b63-81ff-502fac078573" name="Changes" comment="Вынесена часть логики из контроллеров">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/Jwt/JwtAuthenticationFilter.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/Jwt/JwtAuthenticationFilter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/Jwt/JwtResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/Jwt/JwtResponse.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/Jwt/JwtUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/Jwt/JwtUtil.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/controller/AccountController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/controller/AccountController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/controller/AuthController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/controller/AuthController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/example/controller/EditReservationController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/controller/EditReservationController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/controller/RegistrationController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/controller/RegistrationController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/controller/ReservationController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/controller/ReservationController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/controller/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/controller/UserController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/converter/StringConverter.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/converter/StringConverter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/model/Status.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/model/Status.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/repo/ReservationRepo.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/repo/ReservationRepo.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/repo/ReservationRepoCastom.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/repo/ReservationRepoCustom.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/repo/ReservationRepoCastomImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/repo/ReservationRepoCustomImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/security/GlobalExceptionHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/security/GlobalExceptionHandler.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/example/security/SecurityValidator.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/security/SecurityValidator.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/service/BoxService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/service/BoxService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/example/service/ReservationBoxService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/service/ReservationBoxService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/service/ReservationService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/service/ReservationService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/service/ReservationStatusService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/service/ReservationStatusService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/service/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/service/UserService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/db/migration/V1__Init_DB.sql" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/db/migration/V1__Init_DB.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/db/migration/V2__filling_DB.sql" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/db/migration/V2__filling_DB.sql" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -143,7 +120,15 @@
       <option name="project" value="LOCAL" />
       <updated>1723811040653</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="Вынесена часть логики из контроллеров">
+      <option name="closed" value="true" />
+      <created>1726044689728</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1726044689729</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -159,7 +144,8 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Реализовано экзаменационное задание - автомойка" />
-    <option name="LAST_COMMIT_MESSAGE" value="Реализовано экзаменационное задание - автомойка" />
+    <MESSAGE value="Вынесена часть логики из контроллеров" />
+    <option name="LAST_COMMIT_MESSAGE" value="Вынесена часть логики из контроллеров" />
   </component>
   <component name="XDebuggerManager">
     <watches-manager>

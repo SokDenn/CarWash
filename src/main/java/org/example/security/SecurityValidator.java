@@ -43,7 +43,7 @@ public class SecurityValidator {
 
     public boolean isAuthenticated(){
         try {
-            User userAuthentication = userService.getAuthenticationUser();
+            userService.getAuthenticationUser();
             return true;
         }catch (RuntimeException e){
            return false;

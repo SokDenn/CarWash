@@ -84,7 +84,7 @@ public class EditReservationController {
         boolean result = reservationBoxService.updateReservation(reservationId, washingId, startDateTime);
 
         if (!result) {
-            redirectAttributes.addFlashAttribute("message", "Нет свободных боксов или изменения не были внесены");
+            redirectAttributes.addFlashAttribute("message", "Нет свободных боксов / изменения не были внесены / бронь в конечном статусе");
         } else {
             String confirmationLink = "http://localhost:8080/api/reservations/confirm/" + reservationId;
             System.out.println("Для подтверждения брони перейдите по ссылке: " + confirmationLink);
