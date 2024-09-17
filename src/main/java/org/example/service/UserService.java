@@ -13,6 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -23,6 +24,8 @@ public class UserService implements UserDetailsService {
     private RoleRepo roleRepo;
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
 
     public List<User> findAllActive() {
         return userRepo.findAllActive();
@@ -94,10 +97,14 @@ public class UserService implements UserDetailsService {
     }
 
     public boolean isUsernameUnique(UUID userId, String username) {
-        User user = userRepo.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("Пользователь c логином: " + username + " не найден"));;
+        Optional<User> optionalUser = userRepo.findByUsername(username);
 
-        if (user == null || user.getId().equals(userId)) {
+        if (optionalUser.isEmpty()) {
+            return true;
+        }
+
+        User user = optionalUser.get();
+        if (user.getId().equals(userId)) {
             return true;
         }
         return false;
@@ -105,17 +112,8 @@ public class UserService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user;
-        try {
-            user = userRepo.findByUsername(username)
-                    .orElseThrow(() -> new UsernameNotFoundException("Пользователь с таким логином не найден: " + username));
-
-        } catch (UsernameNotFoundException e) {
-            System.out.println(e.getMessage());
-            return null;
-        }
-
-        return user;
+        return userRepo.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("Пользователь с таким логином не найден: " + username));
     }
 
     public User getAuthenticationUser() {
@@ -124,7 +122,7 @@ public class UserService implements UserDetailsService {
         return user;
     }
 
-    public boolean isAdmin(){
+    public boolean isAdmin() {
         User user = getAuthenticationUser();
         return user.getRole().getName().equals("ADMIN");
     }

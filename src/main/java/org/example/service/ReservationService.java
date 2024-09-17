@@ -1,18 +1,18 @@
 package org.example.service;
 
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.persistence.criteria.CriteriaBuilder;
 import org.example.converter.StringConverter;
-import org.example.model.*;
+import org.example.dto.ReservationDTO;
+import org.example.model.Reservation;
+import org.example.model.Status;
 import org.example.repo.ReservationRepo;
-
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 @Service
 public class ReservationService {
@@ -31,9 +31,8 @@ public class ReservationService {
         return reservationRepo.findRelevantReservationsByBox(boxId, startDateTime, endDateTime);
     }
 
-    public List<Reservation> returnFilteredReservationList(UUID boxId, String startDataTimeStr,
+    public List<Reservation> returnFilteredReservationList(UUID boxId, String startDateTimeStr,
                                                            String endDateTimeStr, Boolean activeReservations) {
-
         List<String> statusList = new ArrayList<>();
 
         if (activeReservations != null && activeReservations) {
@@ -47,7 +46,8 @@ public class ReservationService {
             statusList.add(Status.COMPLETED.toString());
         }
 
-        return reservationRepo.findReservations(boxId, startDataTimeStr, endDateTimeStr, statusList);
+        LocalDateTime[] dateTimeRange = stringConverter.parseDateTimeRange(startDateTimeStr, endDateTimeStr);
+        return reservationRepo.findReservations(boxId, dateTimeRange[0], dateTimeRange[1], statusList);
     }
 
     public void deleteReservation(UUID id) {
@@ -81,17 +81,15 @@ public class ReservationService {
         List<String> statusList = new ArrayList<>();
         statusList.add(Status.COMPLETED.toString());
 
-        return reservationRepo.findReservations(null, startDateTimeStr, endDateTimeStr, statusList);
+        LocalDateTime[] dateTimeRange = stringConverter.parseDateTimeRange(startDateTimeStr, endDateTimeStr);
+        return reservationRepo.findReservations(null, dateTimeRange[0], dateTimeRange[1], statusList);
     }
 
     public Long calculateRevenue(List<Reservation> reservationList) {
 
-        Long resultRevenue = 0L;
-
-        for (Reservation reservation : reservationList) {
-            resultRevenue += reservation.getResultPrice();
-        }
-        return resultRevenue;
+        return reservationList.stream()
+                .mapToLong(Reservation::getResultPrice)
+                .sum();
     }
 
     public void updateReservationDiscount(UUID reservationId, Integer discount) {
@@ -103,12 +101,33 @@ public class ReservationService {
         saveReservation(reservation);
     }
 
-    public List<Reservation> getFilteredReservations(UUID boxIdFilter, String startDateTimeStr, String endDateTimeStr,
-                                                     Boolean activeReservations, Boolean displayRevenue){
+    public ReservationDTO getFilteredReservations(UUID boxIdFilter, String startDateTimeStr, String endDateTimeStr,
+                                                  Boolean activeReservations, Boolean displayRevenue) {
+
+        ReservationDTO reservationDTO = new ReservationDTO();
 
         if (userService.isAdmin() && displayRevenue != null) {
-            return returnCompletedReservationList(startDateTimeStr, endDateTimeStr);
+            reservationDTO.setReservationList(
+                    returnCompletedReservationList(startDateTimeStr, endDateTimeStr));
+
+            reservationDTO.setResultRevenue(
+                    calculateRevenue(reservationDTO.getReservationList()));
+
+        } else if (displayRevenue != null && !userService.isAdmin()) {
+            reservationDTO.setMessage("Функция доступна только админу!");
+
+        } else {
+            reservationDTO.setReservationList(
+                    returnFilteredReservationList(boxIdFilter, startDateTimeStr, endDateTimeStr, activeReservations));
         }
-        return returnFilteredReservationList(boxIdFilter, startDateTimeStr, endDateTimeStr, activeReservations);
+
+        reservationDTO.setActiveReservations(activeReservations);
+        reservationDTO.setBoxIdFilter(boxIdFilter);
+        reservationDTO.setStartDateTimeFilter(startDateTimeStr);
+        reservationDTO.setEndDateTimeFilter(endDateTimeStr);
+        reservationDTO.setUserAuthentication(userService.getAuthenticationUser());
+        reservationDTO.setBoxList(boxService.findAllActive());
+
+        return reservationDTO;
     }
 }

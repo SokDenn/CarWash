@@ -12,7 +12,7 @@ public class RoleService {
     @Autowired
     RoleRepo roleRepo;
 
-    public List<Role> findAll(){
+    public List<Role> findAll() {
         return (List<Role>) roleRepo.findAll();
     }
 }

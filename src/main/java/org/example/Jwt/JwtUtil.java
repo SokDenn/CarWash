@@ -86,6 +86,7 @@ public class JwtUtil {
                 .maxAge(86400) // 1 день (1 * 24 * 60 * 60)
                 .build();
     }
+
     public String generatePasswordResetToken(String username) {
         Map<String, Object> claims = new HashMap<>();
 

@@ -1,5 +1,6 @@
 package org.example.converter;
 
+import org.flywaydb.core.internal.util.StringUtils;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -9,27 +10,48 @@ import java.time.format.DateTimeParseException;
 
 @Component
 public class StringConverter {
-    public LocalTime convertTime(String timeStr) {
-        LocalTime localTime = null;
-        try {
-            localTime = LocalTime.parse(timeStr, DateTimeFormatter.ofPattern("HH:mm"));
 
-        } catch (Exception e) {
-            System.out.println("Ошибка парсинга времени: " + e.getMessage());
-            return null;
+    public LocalTime convertTime(String timeStr) {
+        try {
+            return LocalTime.parse(timeStr, DateTimeFormatter.ofPattern("HH:mm"));
+        } catch (DateTimeParseException e) {
+            throw new IllegalArgumentException("Некорректный формат времени: " + timeStr, e);
         }
-        return localTime;
     }
 
-    public LocalDateTime convertDataTime(String dataTimeStr) {
-        LocalDateTime localDateTime = null;
+    public LocalDateTime convertDateTime(String dateTimeStr) {
         try {
-            localDateTime = LocalDateTime.parse(dataTimeStr, DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm"));
-
-        } catch (Exception e) {
-            System.out.println("Ошибка парсинга даты и времени: " + e.getMessage());
-            return null;
+            return LocalDateTime.parse(dateTimeStr, DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm"));
+        } catch (DateTimeParseException e) {
+            throw new IllegalArgumentException("Некорректный формат даты и времени: " + dateTimeStr, e);
         }
-        return localDateTime;
+    }
+
+    public LocalTime[] parseTimeRange(String openingTimeStr, String closingTimeStr) {
+        LocalTime openingTime = null;
+        LocalTime closingTime = null;
+
+        if (StringUtils.hasText(openingTimeStr)) {
+            openingTime = convertTime(openingTimeStr);
+        }
+        if (StringUtils.hasText(closingTimeStr)) {
+            closingTime = convertTime(closingTimeStr);
+        }
+
+        return new LocalTime[]{openingTime, closingTime};
+    }
+
+    public LocalDateTime[] parseDateTimeRange(String startDateTimeStr, String endDateTimeStr) {
+        LocalDateTime startDateTime = null;
+        LocalDateTime endDateTime = null;
+
+        if (StringUtils.hasText(startDateTimeStr)) {
+            startDateTime = convertDateTime(startDateTimeStr);
+        }
+        if (StringUtils.hasText(endDateTimeStr)) {
+            endDateTime = convertDateTime(endDateTimeStr);
+        }
+
+        return new LocalDateTime[]{startDateTime, endDateTime};
     }
 }

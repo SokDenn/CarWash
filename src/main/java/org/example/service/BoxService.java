@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.SortedSet;
@@ -29,21 +30,20 @@ public class BoxService {
     }
 
     public UUID createBox(int boxNumber, UUID userOperatorId, BigDecimal washingСoefficient,
-                             String openingTimeStr, String closingTimeStr) {
+                          String openingTimeStr, String closingTimeStr) {
 
         try {
-            LocalTime openingTime = stringConverter.convertTime(openingTimeStr);
-            LocalTime closingTime = stringConverter.convertTime(closingTimeStr);
+            LocalTime[] timeRange = stringConverter.parseTimeRange(openingTimeStr, closingTimeStr);
 
-            Box box = new Box(boxNumber, washingСoefficient, openingTime, closingTime);
+            Box box = new Box(boxNumber, washingСoefficient, timeRange[0], timeRange[1]);
             if (userOperatorId != null) {
                 box.setUserOperator(userService.getUserById(userOperatorId));
             }
+            saveBox(box);
             return box.getId();
 
         } catch (Exception e) {
-            System.out.println("Ошибка создания бокса: " + e.getMessage());
-            return null;
+            throw new RuntimeException("Ошибка создания бокса: " + e.getMessage(), e);
         }
     }
 
@@ -51,22 +51,21 @@ public class BoxService {
 
         try {
             Box box = boxRepo.findById(boxId).orElseThrow();
-            LocalTime openingTime = stringConverter.convertTime(openingTimeStr);
-            LocalTime closingTime = stringConverter.convertTime(closingTimeStr);
+            LocalTime[] timeRange = stringConverter.parseTimeRange(openingTimeStr, closingTimeStr);
 
             box.setBoxNumber(boxNumber);
             box.setWashingСoefficient(washingСoefficient);
-            box.setOpeningTime(openingTime);
-            box.setClosingTime(closingTime);
+            box.setOpeningTime(timeRange[0]);
+            box.setClosingTime(timeRange[1]);
             if (userOperatorId != null) {
                 box.setUserOperator(userService.getUserById(userOperatorId));
             } else {
                 box.setUserOperator(null);
             }
+            saveBox(box);
 
         } catch (Exception e) {
-            System.out.println("Ошибка обновления бокса: " + e.getMessage());
-            return null;
+            throw new RuntimeException("Ошибка обновления бокса: " + e.getMessage(), e);
         }
         return boxId;
     }

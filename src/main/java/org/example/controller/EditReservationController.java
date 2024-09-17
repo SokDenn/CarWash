@@ -1,11 +1,10 @@
 package org.example.controller;
 
-import org.example.model.Reservation;
+import org.example.dto.ReservationDTO;
 import org.example.security.SecurityValidator;
 import org.example.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -33,7 +32,9 @@ public class EditReservationController {
     @GetMapping
     public String editReservation(Model model) {
 
-        model.addAttribute("washingList", washingService.getAllWashing());
+        ReservationDTO reservationDTO = new ReservationDTO();
+        reservationDTO.setWashingList(washingService.getAllWashing());
+        model.addAttribute("reservationDTO", reservationDTO);
 
         return "editReservation";
     }
@@ -44,17 +45,13 @@ public class EditReservationController {
                                     @RequestParam LocalDateTime startDateTime,
                                     RedirectAttributes redirectAttributes) {
 
-        Reservation reservation = reservationBoxService.createReservation(washingId, startDateTime);
+        ReservationDTO reservationDTO = reservationBoxService.createReservation(washingId, startDateTime);
+        redirectAttributes.addFlashAttribute("message", reservationDTO.getMessage());
 
-        if (reservation == null) {
-            redirectAttributes.addFlashAttribute("selectedStartDateTime", startDateTime);
-            redirectAttributes.addFlashAttribute("selectedWashingId", washingId);
-            redirectAttributes.addFlashAttribute("message", "На это время нет свободных боксов! Выберите другое");
+        if (reservationDTO.getId() == null) {
             return "redirect:/api/reservations/editReservation";
         }
-
-        redirectAttributes.addFlashAttribute("message", "На почту отправлена ссылка для подтверждения");
-        return "redirect:/api/reservations/editReservation/" + reservation.getId();
+        return "redirect:/api/reservations/editReservation/" + reservationDTO.getId();
     }
 
     @GetMapping("/{reservationId}")
@@ -62,16 +59,13 @@ public class EditReservationController {
                                   RedirectAttributes redirectAttributes,
                                   Model model) {
 
-        if (!securityValidator.canEditReservation(reservationService.getReservationById(reservationId))) {
-            redirectAttributes.addFlashAttribute("message", "Вы не можете редактировать не свою запись!");
+        ReservationDTO reservationDTO = securityValidator.canEditReservation(reservationService.getReservationById(reservationId), reservationId);
+
+        if (reservationDTO.getId() == null) {
+            redirectAttributes.addFlashAttribute("message", reservationDTO.getMessage());
             return "redirect:/api/reservations";
         }
-
-        model.addAttribute("reservation", reservationService.getReservationById(reservationId));
-        model.addAttribute("washingList", washingService.getAllWashing());
-        model.addAttribute("discountList", discountService.getPermittedDiscountList());
-        model.addAttribute("statusChangeButtons", reservationStatusService.getStatusChangeButtons(reservationId));
-
+        model.addAttribute("reservationDTO", reservationDTO);
         return "editReservation";
     }
 
@@ -81,16 +75,9 @@ public class EditReservationController {
                                     @RequestParam LocalDateTime startDateTime,
                                     RedirectAttributes redirectAttributes) {
 
-        boolean result = reservationBoxService.updateReservation(reservationId, washingId, startDateTime);
+        ReservationDTO reservationDTO = reservationBoxService.updateReservation(reservationId, washingId, startDateTime);
 
-        if (!result) {
-            redirectAttributes.addFlashAttribute("message", "Нет свободных боксов / изменения не были внесены / бронь в конечном статусе");
-        } else {
-            String confirmationLink = "http://localhost:8080/api/reservations/confirm/" + reservationId;
-            System.out.println("Для подтверждения брони перейдите по ссылке: " + confirmationLink);
-
-            redirectAttributes.addFlashAttribute("message", "Забронировано новое время. На почту отправлена ссылка для подтверждения");
-        }
+        redirectAttributes.addFlashAttribute("message", reservationDTO.getMessage());
 
         return "redirect:/api/reservations/editReservation/" + reservationId;
 
@@ -101,7 +88,7 @@ public class EditReservationController {
                                           @RequestParam String newStatusStr,
                                           RedirectAttributes redirectAttributes) {
 
-        boolean result = reservationStatusService.updateReservationStatus(reservationId, newStatusStr);
+        reservationStatusService.updateReservationStatus(reservationId, newStatusStr);
 
         redirectAttributes.addFlashAttribute("message", "Статус брони обновлен");
 

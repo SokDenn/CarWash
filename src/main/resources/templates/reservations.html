@@ -32,7 +32,7 @@
     </a>
 
     <div class="userAuthentication">
-        <a th:href="@{/api/user/account/edit}" class="btn btn-link" th:text="${userAuthentication.username}"></a>
+        <a th:href="@{/api/user/account/edit}" class="btn btn-link" th:text="${reservationDTO.userAuthentication.username}"></a>
     </div>
 
     <ul class="nav nav-pills">
@@ -58,29 +58,29 @@
         <div class="col-md-2">
             <label for="boxIdFilter" class="form-label">Номер бокса</label>
             <select id="boxIdFilter" name="boxIdFilter" class="form-select">
-                <option value="" th:selected="${boxIdFilter == null}">Все боксы</option>
-                <option th:each="box : ${boxList}" th:value="${box.id}"
-                        th:selected="${box.id == boxIdFilter}" th:text="${box.boxNumber}"></option>
+                <option value="" th:selected="${reservationDTO.boxIdFilter == null}">Все боксы</option>
+                <option th:each="box : ${reservationDTO.boxList}" th:value="${box.id}"
+                        th:selected="${box.id == reservationDTO.boxIdFilter}" th:text="${box.boxNumber}"></option>
             </select>
         </div>
 
         <div class="col-md-2">
             <label for="startDateTimeFilter" class="form-label">Дата и время начала</label>
             <input type="datetime-local" id="startDateTimeFilter" name="startDateTimeFilter" class="form-control"
-                   th:value="${startDateTimeFilter != null ? startDateTimeFilter : ''}">
+                   th:value="${reservationDTO.startDateTimeFilter != null ? reservationDTO.startDateTimeFilter : ''}">
         </div>
 
         <div class="col-md-2">
             <label for="endDateTimeFilter" class="form-label">Дата и время окончания</label>
             <input type="datetime-local" id="endDateTimeFilter" name="endDateTimeFilter" class="form-control"
-                   th:value="${endDateTimeFilter != null ? endDateTimeFilter : ''}">
+                   th:value="${reservationDTO.endDateTimeFilter != null ? reservationDTO.endDateTimeFilter : ''}">
         </div>
 
         <div class="col-md-2">
             <div class="form-check">
                 <input class="form-check-input" type="radio" id="activeReservationsTrue" name="activeReservations"
                        value="true"
-                       th:checked="${activeReservations != null && activeReservations == true}">
+                       th:checked="${reservationDTO.activeReservations != null && reservationDTO.activeReservations == true}">
                 <label class="form-check-label" for="activeReservationsTrue">
                     Активные брони
                 </label>
@@ -88,7 +88,7 @@
             <div class="form-check">
                 <input class="form-check-input" type="radio" id="activeReservationsFalse" name="activeReservations"
                        value="false"
-                       th:checked="${activeReservations != null && activeReservations == false}">
+                       th:checked="${reservationDTO.activeReservations != null && reservationDTO.activeReservations == false}">
                 <label class="form-check-label" for="activeReservationsFalse">
                     Неактивные брони
                 </label>
@@ -97,7 +97,7 @@
             <div class="form-check">
                 <input class="form-check-input" type="radio" id="activeReservationsNull" name="activeReservations"
                        value=""
-                       th:checked="${activeReservations == null}">
+                       th:checked="${reservationDTO.activeReservations == null}">
                 <label class="form-check-label" for="activeReservationsNull">
                     Все брони
                 </label>
@@ -110,8 +110,8 @@
         </div>
     </form>
 
-    <div th:if="${resultRevenue}" class="revenue-display alert alert-info">
-        Общая выручка за выбранный период: <span th:text="${resultRevenue}">0</span> руб.
+    <div th:if="${reservationDTO.resultRevenue}" class="revenue-display alert alert-info">
+        Общая выручка за выбранный период: <span th:text="${reservationDTO.resultRevenue}">0</span> руб.
     </div>
 
 
@@ -138,7 +138,7 @@
             </tr>
             </thead>
             <tbody>
-            <tr th:each="reservation : ${reservationList}">
+            <tr th:each="reservation : ${reservationDTO.reservationList}">
                 <td th:text="${reservation.box.boxNumber}"></td>
                 <td th:text="${reservation.box.userOperator.username}"></td>
                 <td th:text="${reservation.washing.name}"></td>

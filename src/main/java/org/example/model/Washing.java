@@ -25,7 +25,9 @@ public class Washing {
 
     @Column(name = "is_deleted")
     private Boolean isDeleted;
-    public Washing(){}
+
+    public Washing() {
+    }
 
     public Washing(String name, int price, int durationMinute) {
         this.name = name;

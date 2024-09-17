@@ -24,8 +24,8 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ActionException.class)
     public RedirectView handleActionException(HttpServletRequest request,
-                                                          ActionException e,
-                                                          RedirectAttributes redirectAttributes) {
+                                              ActionException e,
+                                              RedirectAttributes redirectAttributes) {
 
         redirectAttributes.addFlashAttribute("message", e.getMessage());
 

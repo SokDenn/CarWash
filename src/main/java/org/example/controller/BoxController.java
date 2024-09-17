@@ -31,7 +31,7 @@ public class BoxController {
 
     @GetMapping({"editBox/{boxId}", "/editBox"})
     public String editBox(@PathVariable(name = "boxId", required = false) UUID boxId,
-                            Model model) {
+                          Model model) {
 
         if (boxId != null) {
             model.addAttribute("box", boxService.getBoxById(boxId));
@@ -49,18 +49,18 @@ public class BoxController {
                             @RequestParam("openingTime") String openingTimeStr,
                             @RequestParam("closingTime") String closingTimeStr) {
 
-        boxService.createBox(boxNumber,userOperatorId, washingСoefficient, openingTimeStr, closingTimeStr);
+        boxService.createBox(boxNumber, userOperatorId, washingСoefficient, openingTimeStr, closingTimeStr);
 
         return "redirect:/api/boxes";
     }
 
     @PostMapping("editBox/{boxId}")
-    public String  updateBox(@PathVariable("boxId") UUID boxId,
-                               @RequestParam("boxNumber") Integer boxNumber,
-                               @RequestParam(name = "userOperatorId", required = false) UUID userOperatorId,
-                               @RequestParam("washingСoefficient") BigDecimal washingСoefficient,
-                               @RequestParam("openingTime") String openingTimeStr,
-                               @RequestParam("closingTime") String closingTimeStr) {
+    public String updateBox(@PathVariable("boxId") UUID boxId,
+                            @RequestParam("boxNumber") Integer boxNumber,
+                            @RequestParam(name = "userOperatorId", required = false) UUID userOperatorId,
+                            @RequestParam("washingСoefficient") BigDecimal washingСoefficient,
+                            @RequestParam("openingTime") String openingTimeStr,
+                            @RequestParam("closingTime") String closingTimeStr) {
 
         boxService.updateBox(boxId, boxNumber, userOperatorId, washingСoefficient, openingTimeStr, closingTimeStr);
 

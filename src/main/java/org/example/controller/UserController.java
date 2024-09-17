@@ -1,5 +1,6 @@
 package org.example.controller;
 
+import org.example.dto.UserDTO;
 import org.example.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -9,7 +10,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Map;
+import java.util.UUID;
 
 @Controller
 @RequestMapping("/api/users")
@@ -24,21 +27,23 @@ public class UserController {
     private ReservationService reservationService;
     @Autowired
     ReservationStatusService reservationStatusService;
+    @Autowired
+    AccountService accountService;
 
     @GetMapping
     @PreAuthorize("hasAuthority('ADMIN')")
     public String getAllUsers(Model model) {
 
-        model.addAttribute("userList", userService.findAllActive());
-        model.addAttribute("discount", discountService.findDiscount());
-        model.addAttribute("userAuthentication", userService.getAuthenticationUser());
+        UserDTO userDTO = accountService.getAllUsers();
+        model.addAttribute("userDTO", userDTO);
 
         return "users";
     }
+
     @GetMapping("/checkUsername")
     public ResponseEntity<Map<String, Boolean>> checkUsername(
-                                    @RequestParam String username,
-                                    @RequestParam(required = false) UUID userId) {
+            @RequestParam String username,
+            @RequestParam(required = false) UUID userId) {
 
         boolean unique = userService.isUsernameUnique(userId, username);
         return ResponseEntity.ok(Collections.singletonMap("unique", unique));
@@ -47,13 +52,10 @@ public class UserController {
     @GetMapping({"editUser/{userId}", "/editUser"})
     @PreAuthorize("hasAuthority('ADMIN')")
     public String editUser(@PathVariable(name = "userId", required = false) UUID userId,
-                          Model model) {
+                           Model model) {
 
-        if (userId != null) {
-            model.addAttribute("user", userService.getUserById(userId));
-        }
-        model.addAttribute("roleList", roleService.findAll());
-        model.addAttribute("userList", userService.findAllActive());
+        UserDTO userDTO = accountService.getEditUsers(userId);
+        model.addAttribute("userDTO", userDTO);
 
         return "editUser";
     }
@@ -70,10 +72,10 @@ public class UserController {
 
     @PostMapping("editUser/{userId}")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public String  updateWashing(@PathVariable("userId") UUID userId,
-                                 @RequestParam("username") String username,
-                                 @RequestParam("password") String password,
-                                 @RequestParam("roleId") UUID roleId) {
+    public String updateWashing(@PathVariable("userId") UUID userId,
+                                @RequestParam("username") String username,
+                                @RequestParam("password") String password,
+                                @RequestParam("roleId") UUID roleId) {
 
         userService.updateUser(userId, username, password, roleId);
 

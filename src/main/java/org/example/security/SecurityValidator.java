@@ -1,14 +1,17 @@
 package org.example.security;
 
 import org.example.Jwt.JwtRequest;
+import org.example.dto.ReservationDTO;
 import org.example.model.Reservation;
 import org.example.model.User;
-import org.example.service.UserService;
+import org.example.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
+
+import java.util.UUID;
 
 @Component
 public class SecurityValidator {
@@ -16,23 +19,39 @@ public class SecurityValidator {
     private AuthenticationManager authenticationManager;
     @Autowired
     private UserService userService;
+    @Autowired
+    private ReservationService reservationService;
+    @Autowired
+    private WashingService washingService;
+    @Autowired
+    private DiscountService discountService;
+    @Autowired
+    private ReservationStatusService reservationStatusService;
 
-    public boolean canEditReservation(Reservation reservation) {
+    public ReservationDTO canEditReservation(Reservation reservation, UUID reservationId) {
 
         User userAuthentication = userService.getAuthenticationUser();
+        ReservationDTO reservationDTO = new ReservationDTO();
 
         boolean isAdmin = userAuthentication.getRole().getName().equals("ADMIN");
         boolean isOperator = userAuthentication.getRole().getName().equals("OPERATOR");
 
-        if (!isAdmin && !isOperator) {
-            return reservation.getUser().getId().equals(userAuthentication.getId());
+        if (!isAdmin) {
+            // Проверка прав для обычного пользователя и оператора
+            boolean canEdit = reservation.getUser().getId().equals(userAuthentication.getId())
+                    || (isOperator && reservation.getBox().getUserOperator().getId().equals(userAuthentication.getId()));
 
-        } else if(isOperator){
-            return reservation.getBox().getUserOperator().getId().equals(userAuthentication.getId())
-                    || reservation.getUser().getId().equals(userAuthentication.getId());
+            if (!canEdit) {
+                reservationDTO.setMessage("Вы не можете редактировать не свою запись!");
+                return reservationDTO;
+            }
         }
 
-        return true;
+        reservationDTO.setReservation(reservationService.getReservationById(reservationId));
+        reservationDTO.setWashingList(washingService.getAllWashing());
+        reservationDTO.setDiscountList(discountService.getPermittedDiscountList());
+        reservationDTO.setStatusChangeButtons(reservationStatusService.getStatusChangeButtons(reservationId));
+        return reservationDTO;
     }
 
     public Authentication authenticate(JwtRequest authenticationRequest) {
@@ -41,12 +60,12 @@ public class SecurityValidator {
         );
     }
 
-    public boolean isAuthenticated(){
+    public boolean isAuthenticated() {
         try {
             userService.getAuthenticationUser();
             return true;
-        }catch (RuntimeException e){
-           return false;
+        } catch (RuntimeException e) {
+            return false;
         }
     }
 }

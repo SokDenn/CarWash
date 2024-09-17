@@ -80,35 +80,36 @@ async function validateUsername() {
         }
 
 async function validateForm(event) {
-      event.preventDefault();  // Останавливаем отправку формы
+    event.preventDefault();  // Останавливаем отправку формы
 
-      const loginInput = document.getElementById("username");
-      const loginPattern = /^[a-zA-Z0-9]+$/;
-      let valid = true;
+    const loginInput = document.getElementById("username");
+    const loginPattern = /^[a-zA-Z0-9]+$/;
+    let valid = true;
 
-      // Проверка формата логина
-      if (!loginPattern.test(loginInput.value)) {
-          loginInput.classList.add("is-invalid");
-          valid = false;
-      } else {
-          loginInput.classList.remove("is-invalid");
-      }
+    // Проверка формата логина
+    if (!loginPattern.test(loginInput.value)) {
+        loginInput.classList.add("is-invalid");
+        valid = false;
+    } else {
+        loginInput.classList.remove("is-invalid");
+    }
 
-      // Проверка уникальности логина
-      const usernameUnique = await validateUsername();
-      if (!usernameUnique) {
-           document.getElementById("username-unique-feedback").style.display = 'block';
-           valid = false;
-      } else {
-           document.getElementById("username-unique-feedback").style.display = 'none';
-      }
+    // Проверка уникальности логина
+    const usernameUnique = await validateUsername();
+    if (!usernameUnique) {
+        document.getElementById("username-unique-feedback").style.display = 'block';
+        valid = false;
+    } else {
+        document.getElementById("username-unique-feedback").style.display = 'none';
+    }
 
-      // Если форма валидна, отправляем её
-      if (valid) {
-           document.getElementById("registrationForm").submit();
-      }
-           return false;
-      }
+    // Если форма валидна, отправляем её
+    if (valid) {
+        document.getElementById("registrationForm").submit();
+    } else {
+        return false;  // Если форма не валидна, возвращаем false
+    }
+}
 
         function validateTime(event) {
             event.preventDefault();  // Останавливаем отправку формы

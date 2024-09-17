@@ -55,7 +55,7 @@
     </div>
 
     <div class="col-md-7 col-lg-8">
-        <div th:if="${reservation != null}">
+        <div th:if="${reservationDTO.id != null}">
 
             <h4 class="mb-3">Информация о брони</h4>
 
@@ -63,13 +63,13 @@
                 <div class="col-sm-6">
                     <label for="user" class="form-label">Пользователь</label>
                     <input type="text" class="form-control" id="user" name="user"
-                           th:value="${reservation.user.username}" readonly>
+                           th:value="${reservationDTO.user.username}" readonly>
                 </div>
 
                 <div class="col-sm-6">
                     <label for="box" class="form-label">Бокс</label>
                     <input type="text" class="form-control" id="box" name="box"
-                           th:value="${reservation.box.boxNumber}" readonly>
+                           th:value="${reservationDTO.box.boxNumber}" readonly>
                 </div>
             </div>
 
@@ -77,13 +77,13 @@
                 <div class="col-sm-6">
                     <label for="resultPrice" class="form-label">Итоговая цена</label>
                     <input type="number" class="form-control" id="resultPrice" name="resultPrice"
-                           th:value="${reservation.resultPrice}" readonly>
+                           th:value="${reservationDTO.resultPrice}" readonly>
                 </div>
 
                 <div class="col-sm-6">
                     <label for="status" class="form-label">Статус</label>
                     <input type="text" class="form-control" id="status" name="status"
-                           th:value="${T(org.example.model.Status).valueOf(reservation.status).name}">
+                           th:value="${T(org.example.model.Status).valueOf(reservationDTO.status).name}">
                 </div>
             </div>
 
@@ -92,7 +92,7 @@
                     <label for="startDateTime" class="form-label">Время начала</label>
                     <input type="datetime-local" class="form-control" id="startDateTime1"
                            name="startDateTime"
-                           th:value="${reservation.startDateTime != null ? reservation.startDateTime : ''}"
+                           th:value="${reservationDTO.startDateTime != null ? reservationDTO.startDateTime : ''}"
                            readonly>
                 </div>
 
@@ -100,33 +100,33 @@
                     <label for="endDateTime" class="form-label">Время окончания</label>
                     <input type="datetime-local" class="form-control" id="endDateTime"
                            name="endDateTime"
-                           th:value="${reservation.endDateTime != null ? reservation.endDateTime : ''}"
+                           th:value="${reservationDTO.endDateTime != null ? reservationDTO.endDateTime : ''}"
                            readonly>
                 </div>
             </div>
 
-            <form th:action="@{'/api/reservations/editReservation/' + ${reservation.id} + '/updateDiscount'}"
+            <form th:action="@{'/api/reservations/editReservation/' + ${reservationDTO.id} + '/updateDiscount'}"
                   method="post" class="row g-3 mb-3">
                 <div class="col-sm-6">
                     <label for="discount" class="form-label">Скидка (%)</label>
                     <select class="form-control" id="discount" name="discount">
-                        <option th:each="discount : ${discountList}"
+                        <option th:each="discount : ${reservationDTO.discountList}"
                                 th:value="${discount}"
-                                th:selected="${reservation.discount == discount}"
+                                th:selected="${reservationDTO.discount == discount}"
                                 th:text="${discount}"></option>
                     </select>
                 </div>
                 <div class="col-md-4 d-flex align-items-end"
-                    th:if="${reservation.status != 'CANCELLED' and reservation.status != 'COMPLETED'}">
+                    th:if="${reservationDTO.status != 'CANCELLED' and reservationDTO.status != 'COMPLETED'}">
                     <button type="submit" class="btn btn-primary">Изменить скидку</button>
                 </div>
             </form>
             <hr class="my-4">
 
-            <div th:if="${statusChangeButtons != null}">
+            <div th:if="${reservationDTO.statusChangeButtons != null}">
                 <div class="d-flex justify-content-end">
-                    <div th:each="entry : ${statusChangeButtons}" class="ms-2">
-                        <form th:action="@{'/api/reservations/editReservation/' + ${reservation.id} + '/updateStatus'}"
+                    <div th:each="entry : ${reservationDTO.statusChangeButtons}" class="ms-2">
+                        <form th:action="@{'/api/reservations/editReservation/' + ${reservationDTO.id} + '/updateStatus'}"
                               method="post" class="d-inline">
                             <input type="hidden" name="newStatusStr" th:value="${entry.value}"/>
 
@@ -147,14 +147,14 @@
 
     <div class="col-md-7 col-lg-8">
         <form id="reservationForm" class="needs-validation"
-              th:action="@{${reservation != null} ? '/api/reservations/editReservation/' + ${reservation.id} : '/api/reservations/editReservation'}"
+              th:action="@{${reservationDTO.id != null} ? '/api/reservations/editReservation/' + ${reservationDTO.id} : '/api/reservations/editReservation'}"
               method="post" onsubmit="return validateTime(event)">
 
             <h4 class="mb-3">Услуга</h4>
-            <div th:each="washing : ${washingList}" class="service-option">
+            <div th:each="washing : ${reservationDTO.washingList}" class="service-option">
                 <input type="radio" th:id="'service' + ${washing.id}" th:name="washingId"
                        th:value="${washing.id}"
-                       th:checked="${reservation != null ? washing.id == reservation.washing.id : washing.id == selectedWashingId}"
+                       th:checked="${reservationDTO.id != null ? washing.id == reservationDTO.washing.id : washing.id == reservationDTO.selectedWashingId}"
                        required>
                 <label th:for="'service' + ${washing.id}">
                     <h5 th:text="${washing.name}"></h5>
@@ -168,7 +168,7 @@
             <div class="mb-3">
                 <label for="startDateTime" class="form-label">Дата и время начала</label>
                 <input type="datetime-local" class="form-control" id="startDateTime" name="startDateTime"
-                       th:value="${reservation != null ? reservation.startDateTime : selectedStartDateTime}" required>
+                       th:value="${reservationDTO.id != null ? reservationDTO.startDateTime : reservationDTO.selectedStartDateTime}" required>
                 <div class="invalid-feedback">Укажите как минимум текущее время + 1 ч.</div>
             </div>
 

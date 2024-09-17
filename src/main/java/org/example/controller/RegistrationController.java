@@ -25,7 +25,7 @@ public class RegistrationController {
     private SecurityValidator securityValidator;
 
     @GetMapping
-    public String registration(RedirectAttributes redirectAttributes){
+    public String registration(RedirectAttributes redirectAttributes) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
         if (securityValidator.isAuthenticated()) {

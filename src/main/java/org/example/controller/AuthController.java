@@ -2,11 +2,7 @@ package org.example.controller;
 
 import org.example.Jwt.JwtRequest;
 import org.example.Jwt.JwtResponse;
-import org.example.Jwt.JwtUtil;
-import org.example.model.User;
-import org.example.security.ActionResponse;
 import org.example.service.AccountService;
-import org.example.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -23,40 +19,42 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> createAuthenticationToken(@RequestBody JwtRequest authenticationRequest) {
-        try {
-            JwtResponse jwtResponse = accountService.authenticateUser(authenticationRequest);
 
-            return ResponseEntity.ok()
-                    .header(HttpHeaders.SET_COOKIE, jwtResponse.getAccessTokenCookie().toString())
-                    .body(jwtResponse);
+        JwtResponse jwtResponse = new JwtResponse();
+        try {
+            jwtResponse = accountService.authenticateUser(authenticationRequest);
 
         } catch (RuntimeException e) {
             if (e.getMessage().equals("Некорректный логин или пароль")) {
                 return ResponseEntity.status(401).body(e.getMessage());
-
             } else {
                 return ResponseEntity.status(500).body("{\"ошибка\":\"Ошибка сервера\"}");
             }
         }
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, jwtResponse.getAccessTokenCookie().toString())
+                .body(jwtResponse);
     }
 
     @PostMapping("/refresh")
     public ResponseEntity<?> refreshAuthenticationToken(@RequestBody JwtRequest refreshRequest) throws Exception {
-        try {
-            JwtResponse jwtResponse = accountService.updateAuthenticateUser(refreshRequest);
 
-            return ResponseEntity.ok()
-                    .header(HttpHeaders.SET_COOKIE, jwtResponse.getAccessTokenCookie().toString())
-                    .body(jwtResponse);
+        JwtResponse jwtResponse = new JwtResponse();
+        try {
+            jwtResponse = accountService.updateAuthenticateUser(refreshRequest);
 
         } catch (RuntimeException e) {
             if (e.getMessage().equals("Некорректный refresh token")) {
                 return ResponseEntity.status(403).body(e.getMessage());
-
             } else {
                 return ResponseEntity.status(500).body("{\"ошибка\":\"Ошибка сервера\"}");
             }
         }
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, jwtResponse.getAccessTokenCookie().toString())
+                .body(jwtResponse);
     }
 
     @GetMapping("/passwordRecovery")
@@ -98,8 +96,8 @@ public class AuthController {
                                       @RequestParam("password") String newPassword,
                                       RedirectAttributes redirectAttributes) {
 
-        ActionResponse actionResponse = accountService.updatePassword(token, newPassword);
-        redirectAttributes.addFlashAttribute("message", actionResponse.getMessage());
+        String message = accountService.updatePassword(token, newPassword);
+        redirectAttributes.addFlashAttribute("message", message);
 
         return "redirect:/login";
     }

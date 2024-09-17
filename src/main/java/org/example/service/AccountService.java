@@ -3,9 +3,9 @@ package org.example.service;
 import org.example.Jwt.JwtRequest;
 import org.example.Jwt.JwtResponse;
 import org.example.Jwt.JwtUtil;
+import org.example.dto.UserDTO;
 import org.example.model.User;
 import org.example.security.ActionException;
-import org.example.security.ActionResponse;
 import org.example.security.SecurityValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseCookie;
@@ -15,6 +15,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
+
+import java.util.UUID;
 
 @Service
 public class AccountService {
@@ -28,8 +30,34 @@ public class AccountService {
     private UserDetailsService userDetailsService;
     @Autowired
     ReservationStatusService reservationStatusService;
+    @Autowired
+    DiscountService discountService;
+    @Autowired
+    RoleService roleService;
 
-    public ActionResponse deleteAccount() {
+    public UserDTO getAllUsers() {
+        UserDTO userDTO = new UserDTO();
+
+        userDTO.setUserList(userService.findAllActive());
+        userDTO.setDiscount(discountService.findDiscount());
+        userDTO.setUserAuthentication(userService.getAuthenticationUser());
+
+        return userDTO;
+    }
+
+    public UserDTO getEditUsers(UUID userId) {
+        UserDTO userDTO = new UserDTO();
+
+        if (userId != null) {
+            userDTO.setUser(userService.getUserById(userId));
+        }
+        userDTO.setRoleList(roleService.findAll());
+        userDTO.setUserList(userService.findAllActive());
+
+        return userDTO;
+    }
+
+    public String deleteAccount() {
         User currentUser = userService.getAuthenticationUser();
         String currentUserRoleStr = currentUser.getRole().getName();
 
@@ -42,10 +70,7 @@ public class AccountService {
         userService.deleteUser(currentUser.getId());
         reservationStatusService.cancelledReservationFromUser(currentUser.getId());
 
-        return new ActionResponse(
-                "redirect:/logout",
-                "Аккаунт удален!"
-        );
+        return "Аккаунт удален!";
     }
 
     public JwtResponse authenticateUser(JwtRequest authenticationRequest) {
@@ -87,7 +112,7 @@ public class AccountService {
         }
     }
 
-    public void passwordRecovery(String username){
+    public void passwordRecovery(String username) {
         String token = jwtUtil.generatePasswordResetToken(username);
 
         String resetLink = "http://localhost:8080/api/v1/auth/passwordReplacement?token=" + token;
@@ -104,19 +129,16 @@ public class AccountService {
         return userService.findByUsername(username);
     }
 
-    public ActionResponse updatePassword(String token, String newPassword) {
-        ActionResponse actionResponse = new ActionResponse();
+    public String updatePassword(String token, String newPassword) {
 
         if (isValidToken(token)) {
             String username = getUserFromToken(token).getUsername();
             userService.updatePassword(username, newPassword);
 
-            actionResponse.setMessage("Ваш пароль был успешно изменен.");
+            return "Ваш пароль был успешно изменен.";
 
         } else {
-            actionResponse.setMessage("Недействительная или истекшая ссылка для сброса пароля.");
+            return "Недействительная или истекшая ссылка для сброса пароля.";
         }
-
-        return actionResponse;
     }
 }

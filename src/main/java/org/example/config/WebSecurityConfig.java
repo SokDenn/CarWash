@@ -1,6 +1,5 @@
 package org.example.config;
 
-import jakarta.servlet.http.Cookie;
 import org.example.Jwt.JwtAuthenticationFilter;
 import org.example.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +25,7 @@ import org.springframework.web.filter.HiddenHttpMethodFilter;
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
-public class WebSecurityConfig{
+public class WebSecurityConfig {
     @Autowired
     private UserService userService;
     @Autowired
@@ -39,7 +38,7 @@ public class WebSecurityConfig{
         http
                 .csrf().disable()
                 .authorizeHttpRequests((requests) -> requests
-                        .requestMatchers("/api/v1/auth/**","/api/users/checkUsername",
+                        .requestMatchers("/api/v1/auth/**", "/api/users/checkUsername",
                                 "/registration", "/login", "/auth.js").permitAll()
                         .anyRequest().authenticated()
                 )
@@ -68,10 +67,12 @@ public class WebSecurityConfig{
         builder.userDetailsService(userService)
                 .passwordEncoder(passwordEncoder);
     }
+
     @Bean
     public static PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder(8);
     }
+
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();

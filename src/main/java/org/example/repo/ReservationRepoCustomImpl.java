@@ -28,8 +28,8 @@ public class ReservationRepoCustomImpl implements ReservationRepoCustom {
     private UserService userService;
 
     @Override
-    public List<Reservation> findReservations(UUID boxId, String startDataTimeStr,
-                                              String endDateTimeStr, List<String> statusList) {
+    public List<Reservation> findReservations(UUID boxId, LocalDateTime startDataTime,
+                                              LocalDateTime endDateTime, List<String> statusList) {
 
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Reservation> query = cb.createQuery(Reservation.class);
@@ -41,13 +41,11 @@ public class ReservationRepoCustomImpl implements ReservationRepoCustom {
             predicates.add(cb.equal(reservation.get("box").get("id"), boxId));
         }
 
-        if (startDataTimeStr != null && startDataTimeStr != "") {
-            LocalDateTime startDataTime = stringConverter.convertDataTime(startDataTimeStr);
+        if (startDataTime != null) {
             predicates.add(cb.greaterThanOrEqualTo(reservation.get("startDateTime"), startDataTime));
         }
 
-        if (endDateTimeStr != null && endDateTimeStr != "") {
-            LocalDateTime endDateTime = stringConverter.convertDataTime(endDateTimeStr);
+        if (endDateTime != null) {
             predicates.add(cb.lessThanOrEqualTo(reservation.get("endDateTime"), endDateTime));
         }
 
@@ -57,7 +55,6 @@ public class ReservationRepoCustomImpl implements ReservationRepoCustom {
 
         User authenticatedUser = userService.getAuthenticationUser();
         if (authenticatedUser.getRole().getName().equals("USER")) {
-
             predicates.add(cb.equal(reservation.get("user"), authenticatedUser));
         }
 

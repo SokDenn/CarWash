@@ -6,6 +6,7 @@ import org.hibernate.annotations.GenericGenerator;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
+
 @Data
 @Entity
 public class Reservation {
@@ -46,7 +47,9 @@ public class Reservation {
 
     @Column(name = "is_deleted")
     private Boolean isDeleted;
-    public Reservation(){}
+
+    public Reservation() {
+    }
 
     public Reservation(Box box, LocalDateTime startDateTime, LocalDateTime endDateTime,
                        Washing washing, User user) {

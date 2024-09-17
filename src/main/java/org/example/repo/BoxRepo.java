@@ -1,7 +1,6 @@
 package org.example.repo;
 
 import org.example.model.Box;
-import org.example.model.Status;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
@@ -12,6 +11,7 @@ import java.util.UUID;
 
 public interface BoxRepo extends CrudRepository<Box, UUID> {
     Optional<Box> findById(UUID boxId);
+
     @Query("SELECT DISTINCT b.boxNumber FROM Box b WHERE b.isDeleted = false")
     SortedSet<Integer> findAllBoxNumber();
 

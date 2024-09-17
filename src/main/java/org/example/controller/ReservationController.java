@@ -1,8 +1,10 @@
 package org.example.controller;
 
-import org.example.model.Reservation;
-import org.example.model.User;
-import org.example.service.*;
+import org.example.dto.ReservationDTO;
+import org.example.service.BoxService;
+import org.example.service.ReservationService;
+import org.example.service.ReservationStatusService;
+import org.example.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
@@ -10,7 +12,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.List;
 import java.util.UUID;
 
 @Controller
@@ -33,22 +34,10 @@ public class ReservationController {
                                @RequestParam(name = "displayRevenue", required = false) Boolean displayRevenue,
                                Model model) {
 
-        List<Reservation> reservationList = reservationService.getFilteredReservations(
+        ReservationDTO reservationDTO = reservationService.getFilteredReservations(
                 boxIdFilter, startDateTimeStr, endDateTimeStr, activeReservations, displayRevenue);
 
-        if (displayRevenue != null && userService.isAdmin()) {
-            model.addAttribute("resultRevenue", reservationService.calculateRevenue(reservationList));
-        } else if (displayRevenue != null && !userService.isAdmin()) {
-            model.addAttribute("message", "Функция доступна только админу!");
-        }
-
-        model.addAttribute("activeReservations", activeReservations);
-        model.addAttribute("boxIdFilter", boxIdFilter);
-        model.addAttribute("startDateTimeFilter", startDateTimeStr);
-        model.addAttribute("endDateTimeFilter", endDateTimeStr);
-        model.addAttribute("userAuthentication", userService.getAuthenticationUser());
-        model.addAttribute("boxList", boxService.findAllActive());
-        model.addAttribute("reservationList", reservationList);
+        model.addAttribute("reservationDTO", reservationDTO);
 
         return "reservations";
     }

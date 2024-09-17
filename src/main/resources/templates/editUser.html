@@ -52,15 +52,15 @@
 
     <div class="col-md-7 col-lg-8">
         <form id="registrationForm" class="needs-validation"
-              th:action="@{${user != null} ? '/api/users/editUser/' + ${user.id} : '/api/users/editUser'}"
+              th:action="@{${userDTO.id != null} ? '/api/users/editUser/' + ${userDTO.id} : '/api/users/editUser'}"
               method="post" onsubmit="return validateForm(event)">
 
-            <input type="hidden" id="userId" th:value="${user != null ? user.id : ''}">
+            <input type="hidden" id="userId" th:value="${userDTO.id != null ? userDTO.id : ''}">
 
             <div class="col-12">
                 <label for="username" class="form-label">Логин</label>
                 <input class="form-control" id="username" name="username"
-                       th:value="${user != null ? user.username : ''}" required>
+                       th:value="${userDTO.id != null ? userDTO.username : ''}" required>
                 <div class="invalid-feedback">Логин должен быть не пустым и содержать только латинские буквы.</div>
                 <div id="username-unique-feedback" class="invalid-feedback">Логин уже занят.</div>
             </div>
@@ -74,10 +74,10 @@
             <div class="col-12">
                 <label for="role" class="form-label">Роль</label>
                 <select id="role" name="roleId" class="form-select" required>
-                    <option value="" th:selected="${user == null}">Нет роли</option>
-                    <option th:each="role : ${roleList}"
+                    <option value="" th:selected="${userDTO.id == null}">Нет роли</option>
+                    <option th:each="role : ${userDTO.roleList}"
                             th:value="${role.id}"
-                            th:selected="${user?.role?.id == role.id}"
+                            th:selected="${userDTO?.role?.id == role.id}"
                             th:text="${role.name}"></option>
                 </select>
             </div>

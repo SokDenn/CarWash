@@ -1,5 +1,6 @@
 package org.example.service;
 
+import org.example.dto.ReservationDTO;
 import org.example.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -56,13 +57,20 @@ public class ReservationBoxService {
         return true;
     }
 
-    public Reservation createReservation(UUID washingId, LocalDateTime startDateTime) {
+    public ReservationDTO createReservation(UUID washingId, LocalDateTime startDateTime) {
         Washing washing = washingService.getWashingById(washingId);
-        if (washing == null) throw new IllegalArgumentException("Тип мойки не найден");
+        if (washing == null) {
+            throw new IllegalArgumentException("Тип мойки не найден");
+        }
 
         Box suitableBox = findSuitableBox(washing, startDateTime, null);
+        ReservationDTO reservationDTO = new ReservationDTO();
+
         if (suitableBox == null) {
-            return null;
+            reservationDTO.setSelectedStartDateTime(startDateTime);
+            reservationDTO.setSelectedWashingId(washingId);
+            reservationDTO.setMessage("На это время нет свободных боксов! Выберите другое");
+            return reservationDTO;
         }
 
         User user = userService.getAuthenticationUser();
@@ -73,34 +81,37 @@ public class ReservationBoxService {
                 washing,
                 user
         );
-
         Reservation reservationSave = reservationService.saveReservation(reservation);
         String confirmationLink = "http://localhost:8080/api/reservations/confirm/" + reservation.getId();
         System.out.println("Для подтверждения брони перейдите по ссылке: " + confirmationLink);
 
-        return reservationSave;
+        reservationDTO.setReservation(reservation);
+        reservationDTO.setMessage("На почту отправлена ссылка для подтверждения");
+        return reservationDTO;
     }
 
-    public boolean updateReservation(UUID reservationId, UUID washingId, LocalDateTime startDateTime) {
+    public ReservationDTO updateReservation(UUID reservationId, UUID washingId, LocalDateTime startDateTime) {
         Washing washing = washingService.getWashingById(washingId);
         if (washing == null) {
             throw new IllegalArgumentException("Тип мойки не найден");
         }
 
         Reservation editReservation = reservationService.getReservationById(reservationId);
-        if (isUnchangedOrCompleted(editReservation, washingId, startDateTime)) {
-            return false;
-        }
-
         Box suitableBox = findSuitableBox(washing, startDateTime, editReservation);
-        if (suitableBox == null) {
-            return false;
+        ReservationDTO reservationDTO = new ReservationDTO();
+
+        if (isUnchangedOrCompleted(editReservation, washingId, startDateTime) || suitableBox == null) {
+            reservationDTO.setMessage("Нет свободных боксов / изменения не были внесены / бронь в конечном статусе");
+            return reservationDTO;
         }
 
         updateReservationDetails(editReservation, washing, suitableBox, startDateTime);
         reservationService.saveReservation(editReservation);
 
-        return true;
+        String confirmationLink = "http://localhost:8080/api/reservations/confirm/" + reservationId;
+        System.out.println("Для подтверждения брони перейдите по ссылке: " + confirmationLink);
+        reservationDTO.setMessage("Забронировано новое время. На почту отправлена ссылка для подтверждения");
+        return reservationDTO;
     }
 
     private boolean isUnchangedOrCompleted(Reservation reservation, UUID washingId, LocalDateTime startDateTime) {

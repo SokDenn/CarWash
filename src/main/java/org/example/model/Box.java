@@ -2,15 +2,12 @@ package org.example.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import org.example.service.UserService;
 import org.hibernate.annotations.GenericGenerator;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.Map;
-import java.util.TreeMap;
 import java.util.UUID;
+
 @Data
 @Entity
 public class Box {
@@ -38,9 +35,11 @@ public class Box {
 
     @Column(name = "is_deleted")
     private Boolean isDeleted;
-    public Box(){}
 
-    public Box(int boxNumber, BigDecimal washingСoefficient, LocalTime openingTime, LocalTime closingTime){
+    public Box() {
+    }
+
+    public Box(int boxNumber, BigDecimal washingСoefficient, LocalTime openingTime, LocalTime closingTime) {
         this.boxNumber = boxNumber;
         this.washingСoefficient = washingСoefficient;
         this.openingTime = openingTime;

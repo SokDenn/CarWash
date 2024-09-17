@@ -1,6 +1,5 @@
 package org.example.controller;
 
-import org.example.security.ActionResponse;
 import org.example.model.User;
 import org.example.service.AccountService;
 import org.example.service.UserService;
@@ -38,8 +37,7 @@ public class AccountController {
         UUID currentUserId = userService.getAuthenticationUser().getId();
         userService.updateUser(currentUserId, username, password, null);
 
-        redirectAttributes.addFlashAttribute("message",
-                "Аккаунт обновлен!");
+        redirectAttributes.addFlashAttribute("message", "Аккаунт обновлен!");
 
         return "redirect:/api/user/account/edit";
     }
@@ -47,9 +45,13 @@ public class AccountController {
     @DeleteMapping("/delete")
     public String deleteAccount(RedirectAttributes redirectAttributes) {
 
-        ActionResponse actionResponse = accountService.deleteAccount();
-        redirectAttributes.addFlashAttribute("message", actionResponse.getMessage());
+        String message = accountService.deleteAccount();
+        redirectAttributes.addFlashAttribute("message", message);
 
-        return actionResponse.getUrl();
+        if (message.equals("Аккаунт удален!")) {
+            return "redirect:/logout";
+        }
+
+        return "redirect:/api/user/account/edit";
     }
 }

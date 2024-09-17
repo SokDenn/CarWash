@@ -32,7 +32,7 @@
     </a>
 
     <div class="userAuthentication">
-        <a th:href="@{/api/user/account/edit}" class="btn btn-link" th:text="${userAuthentication.username}"></a>
+        <a th:href="@{/api/user/account/edit}" class="btn btn-link" th:text="${userDTO.userAuthentication.username}"></a>
     </div>
 
     <ul class="nav nav-pills">
@@ -58,13 +58,13 @@
         <div class="col-md-2">
             <label for="minDiscount" class="form-label">Минимальная скидка в %</label>
             <input type="number" id="minDiscount" name="minDiscount" class="form-control"
-                   th:value="${discount.min != null ? discount.min : ''}" min="0" max="100">
+                   th:value="${userDTO.discount.min != null ? userDTO.discount.min : ''}" min="0" max="100">
         </div>
 
         <div class="col-md-2">
             <label for="maxDiscount" class="form-label">Максимальная скидка в %</label>
             <input type="number" id="maxDiscount" name="maxDiscount" class="form-control"
-                   th:value="${discount.max != null ? discount.max : ''}" min="0" max="100">
+                   th:value="${userDTO.discount.max != null ? userDTO.discount.max : ''}" min="0" max="100">
         </div>
 
         <div class="col-md-4 d-flex align-items-end">
@@ -89,7 +89,7 @@
             </tr>
             </thead>
             <tbody>
-            <tr th:each="user : ${userList}">
+            <tr th:each="user : ${userDTO.userList}">
                 <td th:text="${user.username}"></td>
                 <td>******</td>
                 <td th:text="${user.role != null ? user.role.name : '-'}"></td>

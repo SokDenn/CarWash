@@ -1,16 +1,13 @@
 package org.example.controller;
 
 import org.example.service.UserService;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.ui.Model;
-import org.example.model.Washing;
 import org.example.service.WashingService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
-import java.util.List;
 import java.util.UUID;
 
 @Controller
@@ -54,10 +51,10 @@ public class WashingController {
     }
 
     @PostMapping("editWashing/{washingId}")
-    public String  updateWashing(@PathVariable("washingId") UUID washingId,
-                                 @RequestParam("name") String name,
-                                 @RequestParam("price") Integer price,
-                                 @RequestParam("durationMinute") Integer durationMinute) {
+    public String updateWashing(@PathVariable("washingId") UUID washingId,
+                                @RequestParam("name") String name,
+                                @RequestParam("price") Integer price,
+                                @RequestParam("durationMinute") Integer durationMinute) {
 
         washingService.updateWashing(washingId, name, price, durationMinute);
 
