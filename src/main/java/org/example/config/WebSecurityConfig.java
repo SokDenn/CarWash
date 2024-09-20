@@ -21,7 +21,10 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.authentication.logout.CookieClearingLogoutHandler;
 import org.springframework.web.filter.HiddenHttpMethodFilter;
 
-
+/**
+ * Конфигурационный класс для настройки безопасности приложения с использованием Spring Security.
+ * Включает настройку веб-безопасности, фильтров, методов аутентификации и управления сессиями.
+ */
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
@@ -33,6 +36,12 @@ public class WebSecurityConfig {
     @Autowired
     private JwtAuthenticationFilter jwtAuthenticationFilter;
 
+    /**
+     * Настроить цепочку фильтров безопасности и управление сессиями.
+     *
+     * @param http объект HttpSecurity для конфигурации политики безопасности
+     * @return сконфигурированная цепочка фильтров безопасности
+     */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -62,22 +71,43 @@ public class WebSecurityConfig {
         return http.build();
     }
 
+    /**
+     * Настроить менеджер аутентификации с использованием кастомного UserService и PasswordEncoder.
+     *
+     * @param builder объект для построения менеджера аутентификации
+     */
     @Autowired
     public void configure(AuthenticationManagerBuilder builder) throws Exception {
         builder.userDetailsService(userService)
                 .passwordEncoder(passwordEncoder);
     }
 
+    /**
+     * Создать бин для кодирования паролей с использованием BCrypt с 8 раундами шифрования.
+     *
+     * @return объект PasswordEncoder
+     */
     @Bean
     public static PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder(8);
     }
 
+    /**
+     * Создать бин для менеджера аутентификации на основе текущей конфигурации.
+     *
+     * @param authenticationConfiguration конфигурация аутентификации
+     * @return объект AuthenticationManager
+     */
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
 
+    /**
+     * Создать бин для фильтра скрытых HTTP-методов (для поддержки метода DELETE в формах).
+     *
+     * @return объект FilterRegistrationBean с настроенным HiddenHttpMethodFilter
+     */
     @Bean
     public FilterRegistrationBean<HiddenHttpMethodFilter> hiddenHttpMethodFilter() {
         FilterRegistrationBean<HiddenHttpMethodFilter> filterRegistrationBean = new FilterRegistrationBean<>(new HiddenHttpMethodFilter());

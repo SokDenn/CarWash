@@ -10,6 +10,9 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Сервис для управления бронированием боксов для мойки.
+ */
 @Service
 public class ReservationBoxService {
     @Autowired
@@ -21,6 +24,14 @@ public class ReservationBoxService {
     @Autowired
     private WashingService washingService;
 
+    /**
+     * Найти подходящий бокс для мойки с учетом времени начала и текущей брони.
+     *
+     * @param washing тип мойки
+     * @param startDateTime время начала
+     * @param currentReservation текущая бронь для учета
+     * @return подходящий бокс или null, если таковой не найден
+     */
     public Box findSuitableBox(Washing washing, LocalDateTime startDateTime, Reservation currentReservation) {
         List<Box> availableBoxes = boxService.findAllActive();
 
@@ -33,6 +44,15 @@ public class ReservationBoxService {
         return suitableBoxes.isEmpty() ? null : suitableBoxes.get(0);
     }
 
+    /**
+     * Проверить, доступен ли указанный бокс для бронирования в заданное время.
+     *
+     * @param box бокс для проверки
+     * @param startDateTime время начала
+     * @param durationMinutes длительность мойки в минутах
+     * @param currentReservation текущая бронь (может быть null)
+     * @return true, если бокс доступен, иначе false
+     */
     private boolean isBoxAvailable(Box box, LocalDateTime startDateTime, int durationMinutes, Reservation currentReservation) {
         LocalDateTime endDateTime = startDateTime.plusMinutes
                 ((long) (durationMinutes * box.getWashingСoefficient().floatValue()));
@@ -57,6 +77,13 @@ public class ReservationBoxService {
         return true;
     }
 
+    /**
+     * Создать новую бронь.
+     *
+     * @param washingId ID типа мойки
+     * @param startDateTime время начала бронирования
+     * @return объект ReservationDTO с информацией о созданной броне
+     */
     public ReservationDTO createReservation(UUID washingId, LocalDateTime startDateTime) {
         Washing washing = washingService.getWashingById(washingId);
         if (washing == null) {
@@ -90,6 +117,14 @@ public class ReservationBoxService {
         return reservationDTO;
     }
 
+    /**
+     * Обновить существующую бронь.
+     *
+     * @param reservationId ID брони для обновления
+     * @param washingId новый ID типа мойки
+     * @param startDateTime новое время начала бронирования
+     * @return объект ReservationDTO с информацией об обновленной броне
+     */
     public ReservationDTO updateReservation(UUID reservationId, UUID washingId, LocalDateTime startDateTime) {
         Washing washing = washingService.getWashingById(washingId);
         if (washing == null) {
@@ -108,12 +143,20 @@ public class ReservationBoxService {
         updateReservationDetails(editReservation, washing, suitableBox, startDateTime);
         reservationService.saveReservation(editReservation);
 
-        String confirmationLink = "http://localhost:8080/api/reservations/confirm/" + reservationId;
+        String confirmationLink = "/api/reservations/editReservation/confirm/" + reservationId;
         System.out.println("Для подтверждения брони перейдите по ссылке: " + confirmationLink);
         reservationDTO.setMessage("Забронировано новое время. На почту отправлена ссылка для подтверждения");
         return reservationDTO;
     }
 
+    /**
+     * Проверить, изменилась ли бронь и в конечном ли она статусе.
+     *
+     * @param reservation бронь для проверки
+     * @param washingId новый ID типа мойки
+     * @param startDateTime новое время начала бронирования
+     * @return true, если бронь не изменялась или в конечном статусе, иначе false
+     */
     private boolean isUnchangedOrCompleted(Reservation reservation, UUID washingId, LocalDateTime startDateTime) {
         return reservation.getWashing().getId().equals(washingId)
                 && reservation.getStartDateTime().equals(startDateTime)
@@ -121,6 +164,14 @@ public class ReservationBoxService {
                 || reservation.getStatus().equals(Status.CANCELLED.toString());
     }
 
+    /**
+     * Обновить детали бронирования.
+     *
+     * @param reservation бронь для обновления
+     * @param washing новый тип мойки
+     * @param box новый бокс
+     * @param startDateTime новое время начала
+     */
     private void updateReservationDetails(Reservation reservation, Washing washing, Box box, LocalDateTime startDateTime) {
         reservation.setBox(box);
         reservation.setWashing(washing);
@@ -131,6 +182,14 @@ public class ReservationBoxService {
         reservation.setEndDateTime(calculateEndDateTime(startDateTime, washing, box));
     }
 
+    /**
+     * Рассчитать время окончания бронирования на основе времени начала, типа мойки и бокса.
+     *
+     * @param startDateTime время начала бронирования
+     * @param washing тип мойки
+     * @param box выбранный бокс
+     * @return время окончания бронирования
+     */
     private LocalDateTime calculateEndDateTime(LocalDateTime startDateTime, Washing washing, Box box) {
         return startDateTime.plusMinutes((long)
                 (washing.getDurationMinute() * box.getWashingСoefficient().floatValue()));

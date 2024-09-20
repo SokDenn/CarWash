@@ -13,6 +13,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.UUID;
 
+/**
+ * Класс предоставляет методы для проверки прав доступа и аутентификации пользователей.
+ */
 @Component
 public class SecurityValidator {
     @Autowired
@@ -28,10 +31,23 @@ public class SecurityValidator {
     @Autowired
     private ReservationStatusService reservationStatusService;
 
-    public ReservationDTO canEditReservation(Reservation reservation, UUID reservationId) {
+    /**
+     * Проверяет, имеет ли пользователь право редактировать указанную запись о бронировании.
+     *
+     * @param reservationId идентификатор записи о бронировании
+     * @return объект ReservationDTO с информацией о записи и сообщением о праве редактирования
+     */
+    public ReservationDTO canEditReservation(UUID reservationId) {
+
+        ReservationDTO reservationDTO = new ReservationDTO();
+
+        if(reservationId == null){
+            reservationDTO.setWashingList(washingService.getAllWashing());
+            return reservationDTO;
+        }
 
         User userAuthentication = userService.getAuthenticationUser();
-        ReservationDTO reservationDTO = new ReservationDTO();
+        Reservation reservation = reservationService.getReservationById(reservationId);
 
         boolean isAdmin = userAuthentication.getRole().getName().equals("ADMIN");
         boolean isOperator = userAuthentication.getRole().getName().equals("OPERATOR");
@@ -54,12 +70,23 @@ public class SecurityValidator {
         return reservationDTO;
     }
 
+    /**
+     * Выполняет аутентификацию пользователя по предоставленным учетным данным.
+     *
+     * @param authenticationRequest объект JwtRequest с именем пользователя и паролем
+     * @return объект Authentication, содержащий информацию о пользователе
+     */
     public Authentication authenticate(JwtRequest authenticationRequest) {
         return authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(authenticationRequest.getUsername(), authenticationRequest.getPassword())
         );
     }
 
+    /**
+     * Проверяет, является ли пользователь аутентифицированным.
+     *
+     * @return true, если пользователь аутентифицирован; false в противном случае
+     */
     public boolean isAuthenticated() {
         try {
             userService.getAuthenticationUser();

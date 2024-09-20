@@ -17,6 +17,9 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
+/**
+ * Фильтр для проверки JWT-токена при каждом запросе.
+ */
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private static final String TOKEN_PREFIX = "Bearer ";
@@ -25,6 +28,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Autowired
     private UserDetailsService userDetailsService;
 
+    /**
+     * Проверить JWT токен и аутентифицировать пользователя.
+     *
+     * @param request запрос от клиента
+     * @param response ответ клиенту
+     * @param filterChain цепочка фильтров для дальнейшей обработки
+     */
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {

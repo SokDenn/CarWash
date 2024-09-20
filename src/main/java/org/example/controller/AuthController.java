@@ -11,12 +11,21 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+/**
+ * Контроллер для аутентификации пользователей и восстановления пароля.
+ */
 @Controller
 @RequestMapping("/api/v1/auth")
 public class AuthController {
     @Autowired
     private AccountService accountService;
 
+    /**
+     * Аутентифицировать пользователя и вернуть JWT токен.
+     *
+     * @param authenticationRequest данные для аутентификации (логин и пароль)
+     * @return объект ResponseEntity с JWT токеном или сообщением об ошибке
+     */
     @PostMapping("/login")
     public ResponseEntity<?> createAuthenticationToken(@RequestBody JwtRequest authenticationRequest) {
 
@@ -37,6 +46,12 @@ public class AuthController {
                 .body(jwtResponse);
     }
 
+    /**
+     * Обновить JWT токен по refresh токену.
+     *
+     * @param refreshRequest данные для обновления токена
+     * @return объект ResponseEntity с новым JWT токеном или сообщением об ошибке
+     */
     @PostMapping("/refresh")
     public ResponseEntity<?> refreshAuthenticationToken(@RequestBody JwtRequest refreshRequest) throws Exception {
 
@@ -57,12 +72,22 @@ public class AuthController {
                 .body(jwtResponse);
     }
 
+    /**
+     * Показать страницу восстановления пароля.
+     *
+     * @return страница восстановления пароля
+     */
     @GetMapping("/passwordRecovery")
     public String getPasswordRecovery(RedirectAttributes redirectAttributes) {
         return "passwordRecovery";
     }
 
-
+    /**
+     * Отправить инструкции по восстановлению пароля на email.
+     *
+     * @param username имя пользователя для восстановления пароля
+     * @return перенаправление на страницу логина с сообщением об отправке инструкций
+     */
     @PostMapping("/passwordRecovery")
     public String passwordRecovery(@RequestParam("username") String username, RedirectAttributes redirectAttributes) {
 
@@ -74,6 +99,14 @@ public class AuthController {
         return "redirect:/login";
     }
 
+    /**
+     * Показать страницу для замены пароля по токену восстановления.
+     *
+     * @param token токен восстановления пароля
+     * @param model объект Model для передачи данных на страницу
+     * @param redirectAttributes объект для передачи сообщений после перенаправления
+     * @return страница замены пароля или перенаправление на страницу логина
+     */
     @GetMapping("/passwordReplacement")
     public String getPasswordReplacement(@RequestParam("token") String token,
                                          Model model,
@@ -91,6 +124,13 @@ public class AuthController {
         }
     }
 
+    /**
+     * Заменить старый пароль новым.
+     *
+     * @param token токен восстановления пароля
+     * @param newPassword новый пароль
+     * @return перенаправление на страницу логина с сообщением об успехе
+     */
     @PostMapping("/passwordReplacement")
     public String passwordReplacement(@RequestParam("token") String token,
                                       @RequestParam("password") String newPassword,

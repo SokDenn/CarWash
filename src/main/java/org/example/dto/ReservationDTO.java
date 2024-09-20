@@ -11,6 +11,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+/**
+ДТО для передачи информации о брони для фронта
+*/
 @Data
 public class ReservationDTO {
     //Бронь
@@ -26,28 +29,20 @@ public class ReservationDTO {
     private User user;
     private Boolean isDeleted;
 
-    // Авторизованный пользователь
-    private User userAuthentication;
+    //Доступные кнопки работы с бронью
+    private Map<String, String> statusChangeButtons;
+
+    //Список доступных скидок
+    private List<Integer> discountList;
+
+    //Список доступных услуг
+    private List<Washing> washingList;
 
     // Выбранные поля услуги у брони
     private LocalDateTime selectedStartDateTime;
     private UUID selectedWashingId;
 
-    // Фильтр
-    private UUID boxIdFilter;
-    private String startDateTimeFilter;
-    private String endDateTimeFilter;
-    private Boolean activeReservations;
-
-    //Необходимые списки для отображения
-    private Map<String, String> statusChangeButtons;
-    private List<Integer> discountList;
-    private List<Box> boxList;
-    private List<Washing> washingList;
-    private List<Reservation> reservationList;
-
-    Long resultRevenue;
-
+    //Комментарий по результату действия
     private String message;
 
     public ReservationDTO() {

@@ -1,6 +1,6 @@
 package org.example.controller;
 
-import org.example.dto.ReservationDTO;
+import org.example.dto.ReservationListViewDTO;
 import org.example.service.BoxService;
 import org.example.service.ReservationService;
 import org.example.service.ReservationStatusService;
@@ -14,6 +14,9 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.UUID;
 
+/**
+ * Контроллер для отображения и удаления бронирований.
+ */
 @Controller
 @RequestMapping("/api/reservations")
 public class ReservationController {
@@ -26,6 +29,18 @@ public class ReservationController {
     @Autowired
     ReservationStatusService reservationStatusService;
 
+    /**
+     * Показать отфильтрованные бронирования
+     * или доход за период(может получить только админ).
+     *
+     * @param boxIdFilter фильтр по идентификатору бокса
+     * @param startDateTimeStr начальная дата фильтра
+     * @param endDateTimeStr конечная дата фильтра
+     * @param activeReservations фильтр активных бронирований
+     * @param displayRevenue флаг отображения выручки
+     * @param model объект для передачи данных на страницу
+     * @return страница с бронированиями
+     */
     @GetMapping
     public String reservations(@RequestParam(name = "boxIdFilter", required = false) UUID boxIdFilter,
                                @RequestParam(name = "startDateTimeFilter", required = false) String startDateTimeStr,
@@ -34,28 +49,21 @@ public class ReservationController {
                                @RequestParam(name = "displayRevenue", required = false) Boolean displayRevenue,
                                Model model) {
 
-        ReservationDTO reservationDTO = reservationService.getFilteredReservations(
+        ReservationListViewDTO reservationListViewDTO = reservationService.getFilteredReservations(
                 boxIdFilter, startDateTimeStr, endDateTimeStr, activeReservations, displayRevenue);
 
-        model.addAttribute("reservationDTO", reservationDTO);
+        model.addAttribute("message", reservationListViewDTO.getMessage());
+        model.addAttribute("reservationDTO", reservationListViewDTO);
 
         return "reservations";
     }
 
-    @GetMapping("/confirm/{reservationId}")
-    public String confirmReservation(@PathVariable UUID reservationId,
-                                     RedirectAttributes redirectAttributes) {
-
-        boolean result = reservationStatusService.confirmReservation(reservationId);
-        if (result) {
-            redirectAttributes.addFlashAttribute("message", "Бронь подтверждена.");
-        } else {
-            redirectAttributes.addFlashAttribute("message", "Бронь не может быть подтверждена.");
-        }
-
-        return "redirect:/api/reservations/editReservation/" + reservationId;
-    }
-
+    /**
+     * Удалить бронирование (доступно для ADMIN).
+     *
+     * @param id идентификатор бронирования
+     * @return перенаправление на страницу с бронированиями
+     */
     @PreAuthorize("hasAuthority('ADMIN')")
     @DeleteMapping("/{id}")
     public String deleteReservation(@PathVariable UUID id) {

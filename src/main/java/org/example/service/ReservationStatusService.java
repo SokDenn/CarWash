@@ -14,6 +14,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+/**
+ * Сервис для управления статусами бронирований.
+ */
 @Service
 public class ReservationStatusService {
     @Autowired
@@ -21,6 +24,9 @@ public class ReservationStatusService {
     @Autowired
     private ReservationService reservationService;
 
+    /**
+     * Проверить и обновить статусы резервирований.
+     */
     @Scheduled(fixedRate = 60000) // Проверять каждую минуту
     public void checkReservations() {
         LocalDateTime currentTime = LocalDateTime.now();
@@ -51,7 +57,12 @@ public class ReservationStatusService {
         });
     }
 
-
+    /**
+     * Получить кнопки для изменения статуса резервирования.
+     *
+     * @param reservationId ID резервирования
+     * @return объект с доступными кнопками
+     */
     public Map<String, String> getStatusChangeButtons(UUID reservationId) {
         User user = userService.getAuthenticationUser();
         Reservation reservation = reservationService.getReservationById(reservationId);
@@ -88,6 +99,12 @@ public class ReservationStatusService {
         return buttons;
     }
 
+    /**
+     * Подтвердить резервирование.
+     *
+     * @param reservationId ID резервирования
+     * @return true, если подтверждено
+     */
     public boolean confirmReservation(UUID reservationId) {
         Reservation reservation = reservationService.getReservationById(reservationId);
 
@@ -99,6 +116,11 @@ public class ReservationStatusService {
         return false;
     }
 
+    /**
+     * Отменить активные резервирования пользователя и удалить его.
+     *
+     * @param userId ID пользователя
+     */
     public void cancelledReservationFromUser(UUID userId) {
         List<Reservation> reservationList = reservationService.findByUserId(userId);
 
@@ -115,6 +137,13 @@ public class ReservationStatusService {
         userService.deleteUser(userId);
     }
 
+    /**
+     * Обновить статус резервирования.
+     *
+     * @param reservationId ID резервирования
+     * @param newStatusStr новый статус
+     * @return true, если обновлено
+     */
     public boolean updateReservationStatus(UUID reservationId, String newStatusStr) {
 
         Reservation reservation = reservationService.getReservationById(reservationId);

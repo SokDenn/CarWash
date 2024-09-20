@@ -11,11 +11,17 @@ import org.example.model.Reservation;
 import org.example.model.User;
 import org.example.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.ObjectUtils;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
+/**
+ * Реализация кастомного репозитория ReservationRepoCustom.
+ * Реализует логику для кастомных запросов бронирований с динамическими критериями.
+ */
 
 public class ReservationRepoCustomImpl implements ReservationRepoCustom {
     @Autowired
@@ -27,6 +33,16 @@ public class ReservationRepoCustomImpl implements ReservationRepoCustom {
     @Autowired
     private UserService userService;
 
+    /**
+     * Найти бронирования для конкретного бокса, соответствующие заданным параметрам:
+     * Если пользователь аутентифицирован как USER, то возвращаются только его бронирования.
+     *
+     * @param boxId идентификатор бокса
+     * @param startDataTime начало временного диапазона
+     * @param endDateTime конец временного диапазона
+     * @param statusList список статусов бронирований
+     * @return список бронирований, удовлетворяющих условиям
+     */
     @Override
     public List<Reservation> findReservations(UUID boxId, LocalDateTime startDataTime,
                                               LocalDateTime endDateTime, List<String> statusList) {
@@ -37,19 +53,19 @@ public class ReservationRepoCustomImpl implements ReservationRepoCustom {
 
         List<Predicate> predicates = new ArrayList<>();
 
-        if (boxId != null) {
+        if (!ObjectUtils.isEmpty(boxId)) {
             predicates.add(cb.equal(reservation.get("box").get("id"), boxId));
         }
 
-        if (startDataTime != null) {
+        if (!ObjectUtils.isEmpty(startDataTime)) {
             predicates.add(cb.greaterThanOrEqualTo(reservation.get("startDateTime"), startDataTime));
         }
 
-        if (endDateTime != null) {
+        if (!ObjectUtils.isEmpty(endDateTime)) {
             predicates.add(cb.lessThanOrEqualTo(reservation.get("endDateTime"), endDateTime));
         }
 
-        if (!statusList.isEmpty()) {
+        if (!ObjectUtils.isEmpty(statusList)) {
             predicates.add(reservation.get("status").in(statusList));
         }
 

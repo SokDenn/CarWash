@@ -13,6 +13,9 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+/**
+ * Контроллер для создания и редактирования бронирований.
+ */
 @Controller
 @RequestMapping("/api/reservations/editReservation")
 public class EditReservationController {
@@ -29,17 +32,29 @@ public class EditReservationController {
     @Autowired
     private SecurityValidator securityValidator;
 
+    /**
+     * Показать форму для создания нового бронирования.
+     *
+     * @param model объект Model для передачи данных в представление
+     * @return возвращает страницу создания брони
+     */
     @GetMapping
-    public String editReservation(Model model) {
+    public String createReservation(Model model) {
 
-        ReservationDTO reservationDTO = new ReservationDTO();
-        reservationDTO.setWashingList(washingService.getAllWashing());
+        ReservationDTO reservationDTO = securityValidator.canEditReservation(null);
         model.addAttribute("reservationDTO", reservationDTO);
 
         return "editReservation";
     }
 
-
+    /**
+     * Создать новое бронирование.
+     *
+     * @param washingId идентификатор мойки
+     * @param startDateTime время начала бронирования
+     * @param redirectAttributes объект для передачи сообщений после перенаправления
+     * @return перенаправление на страницу редактирования бронирования или повторное создание бронирования
+     */
     @PostMapping
     public String createReservation(@RequestParam UUID washingId,
                                     @RequestParam LocalDateTime startDateTime,
@@ -54,12 +69,20 @@ public class EditReservationController {
         return "redirect:/api/reservations/editReservation/" + reservationDTO.getId();
     }
 
+    /**
+     * Показать форму для редактирования существующего бронирования по его ID.
+     *
+     * @param reservationId идентификатор бронирования
+     * @param redirectAttributes объект для передачи сообщений после перенаправления
+     * @param model объект Model для передачи данных в представление
+     * @return возвращает страницу редактирования бронирования
+     */
     @GetMapping("/{reservationId}")
-    public String editReservation(@PathVariable UUID reservationId,
+    public String editReservationId(@PathVariable UUID reservationId,
                                   RedirectAttributes redirectAttributes,
                                   Model model) {
 
-        ReservationDTO reservationDTO = securityValidator.canEditReservation(reservationService.getReservationById(reservationId), reservationId);
+        ReservationDTO reservationDTO = securityValidator.canEditReservation(reservationId);
 
         if (reservationDTO.getId() == null) {
             redirectAttributes.addFlashAttribute("message", reservationDTO.getMessage());
@@ -69,6 +92,15 @@ public class EditReservationController {
         return "editReservation";
     }
 
+    /**
+     * Обновить существующее бронирование.
+     *
+     * @param reservationId идентификатор бронирования
+     * @param washingId идентификатор мойки
+     * @param startDateTime новое время начала бронирования
+     * @param redirectAttributes объект для передачи сообщений после перенаправления
+     * @return перенаправление на страницу редактирования бронирования
+     */
     @PostMapping("/{reservationId}")
     public String updateReservation(@PathVariable UUID reservationId,
                                     @RequestParam UUID washingId,
@@ -83,6 +115,14 @@ public class EditReservationController {
 
     }
 
+    /**
+     * Обновить статус бронирования.
+     *
+     * @param reservationId идентификатор бронирования
+     * @param newStatusStr новый статус бронирования
+     * @param redirectAttributes объект для передачи сообщений после перенаправления
+     * @return перенаправление на страницу редактирования бронирования
+     */
     @PostMapping("/{reservationId}/updateStatus")
     public String updateReservationStatus(@PathVariable UUID reservationId,
                                           @RequestParam String newStatusStr,
@@ -96,6 +136,35 @@ public class EditReservationController {
 
     }
 
+    /**
+     * Подтвердить бронирование.
+     *
+     * @param reservationId идентификатор бронирования
+     * @param redirectAttributes объект для передачи сообщений после перенаправления
+     * @return перенаправление на страницу редактирования бронирования
+     */
+    @GetMapping("/confirm/{reservationId}")
+    public String confirmReservation(@PathVariable UUID reservationId,
+                                     RedirectAttributes redirectAttributes) {
+
+        boolean result = reservationStatusService.confirmReservation(reservationId);
+        if (result) {
+            redirectAttributes.addFlashAttribute("message", "Бронь подтверждена.");
+        } else {
+            redirectAttributes.addFlashAttribute("message", "Бронь не может быть подтверждена.");
+        }
+
+        return "redirect:/api/reservations/editReservation/" + reservationId;
+    }
+
+    /**
+     * Обновить скидку у брони доступно для ролей 'OPERATOR' или 'ADMIN'.
+     *
+     * @param reservationId идентификатор бронирования
+     * @param discount новая скидка
+     * @param redirectAttributes объект для передачи сообщений после перенаправления
+     * @return перенаправление на страницу редактирования бронирования
+     */
     @PreAuthorize("hasAuthority('OPERATOR') or hasAuthority('ADMIN')")
     @PostMapping("/{reservationId}/updateDiscount")
     public String updateReservationDiscount(@PathVariable UUID reservationId,

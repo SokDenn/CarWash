@@ -11,6 +11,9 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.UUID;
 
+/**
+ * Контроллер для управления действиями пользователя с его аккаунтом.
+ */
 @Controller
 @RequestMapping("/api/user/account")
 public class AccountController {
@@ -20,6 +23,12 @@ public class AccountController {
     private AccountService accountService;
 
 
+    /**
+     * Показать страницу редактирования аккаунта текущего пользователя.
+     *
+     * @param model объект Model для передачи данных на страницу
+     * @return возвращает страницу "editAccount"
+     */
     @GetMapping("/edit")
     public String editAccount(Model model) {
         User currentUser = userService.getAuthenticationUser();
@@ -29,6 +38,14 @@ public class AccountController {
         return "editAccount";
     }
 
+    /**
+     * Обновить данные аккаунта пользователя.
+     *
+     * @param username новое имя пользователя
+     * @param password новый пароль
+     * @param redirectAttributes объект для передачи сообщений после перенаправления
+     * @return перенаправление на страницу редактирования аккаунта с сообщением об успехе
+     */
     @PostMapping("/edit")
     public String updateAccount(@RequestParam("username") String username,
                                 @RequestParam("password") String password,
@@ -42,6 +59,12 @@ public class AccountController {
         return "redirect:/api/user/account/edit";
     }
 
+    /**
+     * Удалить аккаунт пользователя.
+     *
+     * @param redirectAttributes объект для передачи сообщений после перенаправления
+     * @return перенаправление на страницу выхода или редактирования аккаунта в зависимости от результата удаления
+     */
     @DeleteMapping("/delete")
     public String deleteAccount(RedirectAttributes redirectAttributes) {
 

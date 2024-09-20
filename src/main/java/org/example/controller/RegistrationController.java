@@ -14,6 +14,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+/**
+ * Контроллер для управления регистрацией пользователей.
+ */
 @Controller
 @RequestMapping("/registration")
 public class RegistrationController {
@@ -24,6 +27,12 @@ public class RegistrationController {
     @Autowired
     private SecurityValidator securityValidator;
 
+    /**
+     * Показать страницу регистрации или перенаправить на страницу бронирований (так как она доступна всем пользователям).
+     *
+     * @param redirectAttributes объект для передачи сообщений после перенаправления
+     * @return страницу регистрации или перенаправление на страницу с бронированиями
+     */
     @GetMapping
     public String registration(RedirectAttributes redirectAttributes) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -37,6 +46,13 @@ public class RegistrationController {
         return "registration";
     }
 
+    /**
+     * Зарегистрировать нового пользователя и перенаправить на страницу входа.
+     *
+     * @param user объект User с данными для регистрации
+     * @param model объект для передачи данных в представление
+     * @return перенаправление на страницу входа
+     */
     @PostMapping
     public String addUser(User user, Model model) {
 

@@ -14,6 +14,9 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.UUID;
 
+/**
+ * Контроллер для управления пользователями.
+ */
 @Controller
 @RequestMapping("/api/users")
 public class UserController {
@@ -30,6 +33,12 @@ public class UserController {
     @Autowired
     AccountService accountService;
 
+    /**
+     * Показать всех пользователей (только для ADMIN).
+     *
+     * @param model объект для передачи данных на страницу
+     * @return страницу с пользователями
+     */
     @GetMapping
     @PreAuthorize("hasAuthority('ADMIN')")
     public String getAllUsers(Model model) {
@@ -40,6 +49,13 @@ public class UserController {
         return "users";
     }
 
+    /**
+     * Проверить уникальность имени пользователя.
+     *
+     * @param username имя пользователя
+     * @param userId идентификатор пользователя (опционально)
+     * @return результат проверки уникальности
+     */
     @GetMapping("/checkUsername")
     public ResponseEntity<Map<String, Boolean>> checkUsername(
             @RequestParam String username,
@@ -49,6 +65,13 @@ public class UserController {
         return ResponseEntity.ok(Collections.singletonMap("unique", unique));
     }
 
+    /**
+     * Показать форму редактирования пользователя (только для ADMIN).
+     *
+     * @param userId идентификатор пользователя (опционально)
+     * @param model объект для передачи данных на страницу
+     * @return страницу редактирования пользователя
+     */
     @GetMapping({"editUser/{userId}", "/editUser"})
     @PreAuthorize("hasAuthority('ADMIN')")
     public String editUser(@PathVariable(name = "userId", required = false) UUID userId,
@@ -60,6 +83,14 @@ public class UserController {
         return "editUser";
     }
 
+    /**
+     * Создать нового пользователя (только для ADMIN).
+     *
+     * @param username имя пользователя
+     * @param password пароль
+     * @param roleId идентификатор роли
+     * @return перенаправление на страницу пользователей
+     */
     @PostMapping("/editUser")
     @PreAuthorize("hasAuthority('ADMIN')")
     public String createUser(@RequestParam("username") String username,
@@ -70,6 +101,15 @@ public class UserController {
         return "redirect:/api/users";
     }
 
+    /**
+     * Обновить пользователя (только для ADMIN).
+     *
+     * @param userId идентификатор пользователя
+     * @param username имя пользователя
+     * @param password пароль
+     * @param roleId идентификатор роли
+     * @return перенаправление на страницу пользователей
+     */
     @PostMapping("editUser/{userId}")
     @PreAuthorize("hasAuthority('ADMIN')")
     public String updateWashing(@PathVariable("userId") UUID userId,
@@ -82,6 +122,13 @@ public class UserController {
         return "redirect:/api/users";
     }
 
+    /**
+     * Обновить минимальную и максимальную скидку оператора (только для ADMIN).
+     *
+     * @param minDiscount минимальная скидка
+     * @param maxDiscount максимальная скидка
+     * @return перенаправление на страницу пользователей
+     */
     @PostMapping("/discount")
     @PreAuthorize("hasAuthority('ADMIN')")
     public String updateDiscountOperator(@RequestParam("minDiscount") Integer minDiscount,
@@ -91,6 +138,13 @@ public class UserController {
         return "redirect:/api/users";
     }
 
+    /**
+     * Удалить пользователя (только для ADMIN).
+     *
+     * @param id идентификатор пользователя
+     * @param redirectAttributes объект для передачи сообщений после перенаправления
+     * @return перенаправление на страницу пользователей
+     */
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")
     public String deleteUser(@PathVariable UUID id,

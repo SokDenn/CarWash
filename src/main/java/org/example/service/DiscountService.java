@@ -9,6 +9,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+/**
+ * Сервис для управления скидками, включая их сохранение и получение списка разрешенных скидок.
+ */
 @Service
 public class DiscountService {
     @Autowired
@@ -16,6 +19,12 @@ public class DiscountService {
     @Autowired
     private ReservationService reservationService;
 
+    /**
+     * Сохранить новые минимальные и максимальные значения скидки.
+     *
+     * @param minDiscount новое минимальное значение скидки
+     * @param maxDiscount новое максимальное значение скидки
+     */
     public void saveDiscount(Integer minDiscount, Integer maxDiscount) {
         Discount discount = findDiscount();
         discount.setMin(minDiscount);
@@ -24,10 +33,20 @@ public class DiscountService {
         discountRepo.save(discount);
     }
 
+    /**
+     * Найти диапазон скидки в БД.
+     *
+     * @return объект Discount, представляющий текущую скидку
+     */
     public Discount findDiscount() {
         return discountRepo.findFirstBy();
     }
 
+    /**
+     * Получить список разрешенных значений скидок в диапазоне от минимальной до максимальной.
+     *
+     * @return список разрешенных значений скидок
+     */
     public List<Integer> getPermittedDiscountList() {
 
         Discount discount = findDiscount();

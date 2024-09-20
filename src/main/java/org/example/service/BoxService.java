@@ -16,6 +16,9 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+/**
+ * Сервис для управления боками, включая создание, обновление, получение и удаление боков.
+ */
 @Service
 public class BoxService {
     @Autowired
@@ -25,10 +28,26 @@ public class BoxService {
     @Autowired
     private StringConverter stringConverter;
 
+    /**
+     * Получить бокс по его ID.
+     *
+     * @param id идентификатор бокса
+     * @return объект Box или null, если не найден
+     */
     public Box getBoxById(UUID id) {
         return boxRepo.findById(id).orElse(null);
     }
 
+    /**
+     * Создать новый бокс с указанными параметрами.
+     *
+     * @param boxNumber номер бокса
+     * @param userOperatorId идентификатор оператора
+     * @param washingСoefficient коэффициент мойки
+     * @param openingTimeStr время открытия в строковом формате
+     * @param closingTimeStr время закрытия в строковом формате
+     * @return идентификатор созданного бокса
+     */
     public UUID createBox(int boxNumber, UUID userOperatorId, BigDecimal washingСoefficient,
                           String openingTimeStr, String closingTimeStr) {
 
@@ -47,6 +66,17 @@ public class BoxService {
         }
     }
 
+    /**
+     * Обновить существующий бокс с указанными параметрами.
+     *
+     * @param boxId идентификатор бокса
+     * @param boxNumber новый номер бокса
+     * @param userOperatorId идентификатор нового оператора
+     * @param washingСoefficient новый коэффициент мойки
+     * @param openingTimeStr новое время открытия в строковом формате
+     * @param closingTimeStr новое время закрытия в строковом формате
+     * @return идентификатор обновленного бокса
+     */
     public UUID updateBox(UUID boxId, int boxNumber, UUID userOperatorId, BigDecimal washingСoefficient, String openingTimeStr, String closingTimeStr) {
 
         try {
@@ -70,6 +100,12 @@ public class BoxService {
         return boxId;
     }
 
+    /**
+     * Получить список доступных номеров боксов.
+     *
+     * @param boxId идентификатор бокса (если имеется, добавляет его номер в список)
+     * @return список доступных номеров боксов
+     */
     public List<Integer> getAvailableBoxNumbers(UUID boxId) {
         SortedSet<Integer> existingBoxNumbers = boxRepo.findAllBoxNumber();
 
@@ -88,14 +124,31 @@ public class BoxService {
         return allBoxNumbers;
     }
 
+    /**
+     * Получить список всех активных боксов.
+     *
+     * @return список объектов Box, представляющих активные боксы
+     */
     public List<Box> findAllActive() {
         return boxRepo.findAllActive();
     }
 
+    /**
+     * Сохранить указанный бокс в репозитории.
+     *
+     * @param box объект Box для сохранения
+     * @return сохраненный объект Box
+     */
     public Box saveBox(Box box) {
         return boxRepo.save(box);
     }
 
+    /**
+     * Удалить бокс по его ID, помечая его как удаленный.
+     *
+     * @param boxId идентификатор бокса для удаления
+     * @throws EntityNotFoundException если бокс с указанным ID не найден
+     */
     public void deleteBox(UUID boxId) {
         Box box = boxRepo.findById(boxId)
                 .orElseThrow(() -> new EntityNotFoundException("Box c ID: " + boxId + " не найден"));

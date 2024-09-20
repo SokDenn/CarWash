@@ -4,12 +4,15 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="980122c5-98ea-4b63-81ff-502fac078573" name="Changes" comment="Исправлена ошибка с редактированием брони в конечном статусе">
-      <change afterPath="$PROJECT_DIR$/src/main/java/org/example/dto/ReservationDTO.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/org/example/dto/UserDTO.java" afterDir="false" />
+    <list default="true" id="980122c5-98ea-4b63-81ff-502fac078573" name="Changes" comment="Исправлены ошибки по комментариям на 21.08. Также отформатирован код">
+      <change afterPath="$PROJECT_DIR$/src/main/java/org/example/dto/ReservationListViewDTO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/org/example/security/DeleteAccountException.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/CarWashApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/CarWashApplication.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/Jwt/JwtAuthenticationFilter.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/Jwt/JwtAuthenticationFilter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/Jwt/JwtRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/Jwt/JwtRequest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/Jwt/JwtResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/Jwt/JwtResponse.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/example/Jwt/JwtUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/Jwt/JwtUtil.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/config/MvcConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/config/MvcConfig.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/example/config/WebSecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/config/WebSecurityConfig.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/example/controller/AccountController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/controller/AccountController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/example/controller/AuthController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/controller/AuthController.java" afterDir="false" />
@@ -20,18 +23,17 @@
       <change beforePath="$PROJECT_DIR$/src/main/java/org/example/controller/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/controller/UserController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/example/controller/WashingController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/controller/WashingController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/example/converter/StringConverter.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/converter/StringConverter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/model/Box.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/model/Box.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/model/Reservation.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/model/Reservation.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/model/Role.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/model/Role.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/model/Washing.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/model/Washing.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/dto/ReservationDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/dto/ReservationDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/dto/UserDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/dto/UserDTO.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/example/repo/BoxRepo.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/repo/BoxRepo.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/example/repo/DiscountRepo.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/repo/DiscountRepo.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/repo/ReservationRepo.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/repo/ReservationRepo.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/example/repo/ReservationRepoCustom.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/repo/ReservationRepoCustom.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/example/repo/ReservationRepoCustomImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/repo/ReservationRepoCustomImpl.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/example/repo/RoleRepo.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/repo/RoleRepo.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/example/repo/UserRepo.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/repo/UserRepo.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/example/repo/WashingRepo.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/repo/WashingRepo.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/security/ActionResponse.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/security/ActionException.java" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/example/security/GlobalExceptionHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/security/GlobalExceptionHandler.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/example/security/SecurityValidator.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/security/SecurityValidator.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/example/service/AccountService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/service/AccountService.java" afterDir="false" />
@@ -43,11 +45,6 @@
       <change beforePath="$PROJECT_DIR$/src/main/java/org/example/service/RoleService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/service/RoleService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/example/service/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/service/UserService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/example/service/WashingService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/service/WashingService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/static/auth.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/auth.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/editReservation.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/editReservation.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/editUser.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/editUser.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/reservations.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/reservations.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/users.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/users.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -175,7 +172,15 @@
       <option name="project" value="LOCAL" />
       <updated>1726124757026</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="Исправлены ошибки по комментариям на 21.08. Также отформатирован код">
+      <option name="closed" value="true" />
+      <created>1726552640917</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1726552640917</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -193,23 +198,10 @@
     <MESSAGE value="Реализовано экзаменационное задание - автомойка" />
     <MESSAGE value="Вынесена часть логики из контроллеров" />
     <MESSAGE value="Исправлена ошибка с редактированием брони в конечном статусе" />
-    <option name="LAST_COMMIT_MESSAGE" value="Исправлена ошибка с редактированием брони в конечном статусе" />
+    <MESSAGE value="Исправлены ошибки по комментариям на 21.08. Также отформатирован код" />
+    <option name="LAST_COMMIT_MESSAGE" value="Исправлены ошибки по комментариям на 21.08. Также отформатирован код" />
   </component>
   <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/org/example/controller/ReservationController.java</url>
-          <line>36</line>
-          <option name="timeStamp" value="14" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/org/example/service/ReservationService.java</url>
-          <line>35</line>
-          <option name="timeStamp" value="16" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
     <watches-manager>
       <configuration name="Application">
         <watch expression="reservationService" language="JAVA" />
